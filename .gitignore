@@ -1,3 +1,7 @@
 /target
 /project/target
-/project/project
+/project/project/target
+/shared/.jvm/target
+/shared/.js/target
+/server/target
+/client/target
