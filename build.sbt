@@ -12,8 +12,8 @@ lazy val root = (project in file("."))
       "org.http4s" %% "http4s-dsl" % Http4sVersion,
       "ch.qos.logback" % "logback-classic" % "1.2.3",
       // test
-      "org.mockito" % "mockito-core" % "2.13.0" % "test",
-      "org.scalatest" %% "scalatest" % "3.0.4" % "test"
+      "org.mockito" % "mockito-core" % "2.15.0" % "test",
+      "org.scalatest" %% "scalatest" % "3.0.5" % "test"
     )
   )
 
