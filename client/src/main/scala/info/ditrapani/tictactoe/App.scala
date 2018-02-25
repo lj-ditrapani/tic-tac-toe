@@ -5,7 +5,8 @@ import org.scalajs.jquery.jQuery
 object App {
   def main(args: Array[String]): Unit = {
     println("Hello world!")
-    setupUI()
+    jQuery(() => setupUI())
+    (): Unit
   }
 
   def appendPar(text: String): Unit = {

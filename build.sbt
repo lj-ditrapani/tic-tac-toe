@@ -51,14 +51,11 @@ lazy val client = project
       "org.scalatest" %%% "scalatest" % "3.0.5" % "test"
     ),
     skip in packageJSDependencies := false,
-    jsDependencies += "org.webjars" % "jquery" % "3.2.1" / "3.2.1/jquery.js"
+    jsDependencies += "org.webjars" % "jquery" % "3.2.1" / "3.2.1/jquery.js",
+    jsEnv := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv()
   )
   .enablePlugins(ScalaJSPlugin)
   .dependsOn(sharedJs)
-
-/*
-jsEnv := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv()
- */
 
 wartremoverWarnings ++= Warts.allBut(
   Wart.Equals,
