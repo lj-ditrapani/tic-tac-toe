@@ -5,10 +5,7 @@ lazy val commonSettings = Seq(
   scalaVersion := "2.12.4"
 )
 
-lazy val shared = crossProject
-  .crossType(CrossType.Pure)
-  .in(file("shared"))
-  .settings(commonSettings)
+lazy val shared = crossProject.crossType(CrossType.Pure).in(file("shared")).settings(commonSettings)
 lazy val sharedJvm = shared.jvm
 lazy val sharedJs = shared.js
 
@@ -32,7 +29,6 @@ lazy val server = project
 lazy val client = project.in(file("client")).dependsOn(sharedJs)
 
 scalacOptions ++= Seq(
-  "-target:jvm-1.8",
   "-deprecation",
   "-encoding",
   "UTF-8",
