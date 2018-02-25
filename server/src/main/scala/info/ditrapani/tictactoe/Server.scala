@@ -10,7 +10,7 @@ import org.http4s.server.blaze.BlazeBuilder
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Random
 
-object HelloWorldServer extends StreamApp[IO] with Http4sDsl[IO] {
+object Server extends StreamApp[IO] with Http4sDsl[IO] {
   private val p1Id = Random.nextInt()
   private val p2Id = Random.nextInt()
   @SuppressWarnings(Array("org.wartremover.warts.Var"))

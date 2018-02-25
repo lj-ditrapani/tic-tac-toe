@@ -61,6 +61,3 @@ lazy val client = project
   )
   .enablePlugins(ScalaJSPlugin)
   .dependsOn(sharedJs)
-
-scalafmtVersion in ThisBuild := "1.4.0"
-scalafmtOnCompile in ThisBuild := true

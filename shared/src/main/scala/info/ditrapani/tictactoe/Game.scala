@@ -12,7 +12,9 @@ sealed abstract class Player
 object Player1 extends Player {
   override def toString = "Player1"
 }
-object Player2 extends Player{override def toString = "Player1"}
+object Player2 extends Player {
+  override def toString = "Player1"
+}
 
 final case class Board(cells: Vector[Cell])
 
