@@ -1,0 +1,9 @@
+{
+  "name": "tic-tac-toe",
+  "dependencies": {},
+  "author": "Lyall Jonathan Di Trapani",
+  "devDependencies": {
+    "jsdom": "^11.6.2",
+    "source-map-support": "^0.5.3"
+  }
+}

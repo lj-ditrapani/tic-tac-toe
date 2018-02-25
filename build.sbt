@@ -26,7 +26,26 @@ lazy val server = project
   )
   .dependsOn(sharedJvm)
 
-lazy val client = project.in(file("client")).dependsOn(sharedJs)
+lazy val client = project
+  .in(file("client"))
+  .settings(
+    scalaJSUseMainModuleInitializer := true,
+    libraryDependencies ++= Seq(
+      "org.scala-js" %%% "scalajs-dom" % "0.9.4",
+      "be.doeraene" %%% "scalajs-jquery" % "0.9.2",
+      "com.lihaoyi" %%% "scalatags" % "0.6.7",
+      // test
+      "org.scalatest" %%% "scalatest" % "3.0.5" % "test"
+    ),
+  )
+  .enablePlugins(ScalaJSPlugin)
+  .dependsOn(sharedJs)
+
+/*
+skip in packageJSDependencies := false
+jsDependencies += "org.webjars" % "jquery" % "3.2.1" / "3.2.1/jquery.js"
+jsEnv := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv()
+*/
 
 scalacOptions ++= Seq(
   "-deprecation",
