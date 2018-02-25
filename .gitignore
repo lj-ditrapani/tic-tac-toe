@@ -6,3 +6,4 @@
 /server/target
 /client/target
 /node_modules
+/server/src/main/resources/js
