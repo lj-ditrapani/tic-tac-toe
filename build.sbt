@@ -1,8 +1,20 @@
 lazy val commonSettings = Seq(
   organization := "info.ditrapani",
-  name := "tic-tac-toe",
   version := "0.0.1",
-  scalaVersion := "2.12.4"
+  scalaVersion := "2.12.4",
+  scalacOptions ++= Seq(
+    "-deprecation",
+    "-encoding",
+    "UTF-8",
+    "-unchecked",
+    "-Xlint",
+    "-Ypartial-unification",
+    "-Ywarn-dead-code",
+    "-Ywarn-numeric-widen",
+    "-Ywarn-unused",
+    "-Ywarn-value-discard",
+    "-Xfuture"
+  )
 )
 
 lazy val shared = crossProject.crossType(CrossType.Pure).in(file("shared")).settings(commonSettings)
@@ -29,6 +41,7 @@ lazy val server = project
 lazy val client = project
   .in(file("client"))
   .settings(
+    commonSettings,
     scalaJSUseMainModuleInitializer := true,
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "0.9.4",
@@ -37,29 +50,15 @@ lazy val client = project
       // test
       "org.scalatest" %%% "scalatest" % "3.0.5" % "test"
     ),
+    skip in packageJSDependencies := false,
+    jsDependencies += "org.webjars" % "jquery" % "3.2.1" / "3.2.1/jquery.js"
   )
   .enablePlugins(ScalaJSPlugin)
   .dependsOn(sharedJs)
 
 /*
-skip in packageJSDependencies := false
-jsDependencies += "org.webjars" % "jquery" % "3.2.1" / "3.2.1/jquery.js"
 jsEnv := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv()
-*/
-
-scalacOptions ++= Seq(
-  "-deprecation",
-  "-encoding",
-  "UTF-8",
-  "-unchecked",
-  "-Xlint",
-  "-Ypartial-unification",
-  "-Ywarn-dead-code",
-  "-Ywarn-numeric-widen",
-  "-Ywarn-unused",
-  "-Ywarn-value-discard",
-  "-Xfuture"
-)
+ */
 
 wartremoverWarnings ++= Warts.allBut(
   Wart.Equals,
