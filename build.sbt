@@ -14,6 +14,10 @@ lazy val commonSettings = Seq(
     "-Ywarn-unused",
     "-Ywarn-value-discard",
     "-Xfuture"
+  ),
+  wartremoverWarnings ++= Warts.allBut(
+    Wart.Equals,
+    Wart.NonUnitStatements
   )
 )
 
@@ -26,6 +30,7 @@ val Http4sVersion = "0.18.0"
 lazy val server = project
   .in(file("server"))
   .settings(
+    commonSettings,
     libraryDependencies ++= Seq(
       "org.http4s" %% "http4s-blaze-server" % Http4sVersion,
       "org.http4s" %% "http4s-circe" % Http4sVersion,
@@ -56,11 +61,6 @@ lazy val client = project
   )
   .enablePlugins(ScalaJSPlugin)
   .dependsOn(sharedJs)
-
-wartremoverWarnings ++= Warts.allBut(
-  Wart.Equals,
-  Wart.NonUnitStatements
-)
 
 scalafmtVersion in ThisBuild := "1.4.0"
 scalafmtOnCompile in ThisBuild := true
