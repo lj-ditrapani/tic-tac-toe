@@ -1,8 +1,20 @@
+Tic-tac-toe 
+===========
 
+tic-tac-toe client/server in scala using http4s & scala.js
 
-Issues
+Status
 ------
 
-For client and server code, scalafmt runs on compile just fine.
-But I can't figure out how to get scalafmt to run automatically
-(or manually) for the shared code.
+WIP.  Project structure setup.
+Learning http4s/working on server logic.
+Client unimplemented
+
+```
+sbt client/fullOptJS
+bash copy.sh
+sbt server/assembly
+java -jar server/target/scala-2.12/server-assembly-x.x.x.jar
+```
+
+Open `localhost:8080/` in browser.
