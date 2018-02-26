@@ -37,7 +37,7 @@ object Server extends StreamApp[IO] with Http4sDsl[IO] {
       static(s"js/$file", request)
     case request @ GET -> Root / "status" =>
       Ok(s"you are ${getPlayer(request)}; current game status is $game")
-    case request @ PUT -> Root / "play" / IntVar(x) / IntVar(y) =>
+    case request @ POST -> Root / "play" / IntVar(x) / IntVar(y) =>
       getBoard(game, request) match {
         case None => Ok(s"It is not your turn; you played on position $x $y")
         case Some(board) => Ok(s"It is your turn and you played on position $x $y with $board")
