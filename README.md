@@ -50,12 +50,14 @@ Status string: 12 characters with format PSSCCCCCCCCC where
     - S: Spectator
 - SS: Game state
     - IN: Init
-    - 1R: Player1Ready
-    - 2R: Player2Ready
-    - 1T: Player1Turn
-    - 2T: Player2Turn
-    - GO: GameOver
+    - R1: Player1Ready
+    - R2: Player2Ready
+    - T1: Player1Turn
+    - T2: Player2Turn
+    - G1: GameOver; player 1 wins
+    - G2: GameOver; player 2 wins
+    - GS: GameOver; it's a tie
 - C: Board Cell
     - E: Empty
-    - X: player 1 played an X here
-    - O: player 2 played an O here
+    - X: player 1 has an X here
+    - O: player 2 has an O here

@@ -36,13 +36,16 @@ object Server extends StreamApp[IO] with Http4sDsl[IO] {
     case request @ GET -> Root / "js" / file =>
       static(s"js/$file", request)
     case request @ GET -> Root / "status" =>
-      Ok(s"you are ${getPlayer(request)}; current game status is $game")
+      Ok(statusString(getPlayer(request), game))
     case request @ POST -> Root / "play" / IntVar(x) / IntVar(y) =>
+      val player = getPlayer(request)
       getBoard(game, request) match {
-        case None => Ok(s"It is not your turn; you played on position $x $y")
-        case Some(board) => Ok(s"It is your turn and you played on position $x $y with $board")
+        case None => Ok(statusString(player, game) + s" not your turn! $x $y")
+        case Some(board) => Ok(statusString(player, game) + s" it was your turn $x $y $board")
       }
   }
+
+  def statusString(player: Player, game: Game): String = player.toResponse + game.toResponse
 
   def getPlayer(request: Request[IO]): Player = {
     val maybeCookie: Option[Cookie] = for {
