@@ -8,7 +8,8 @@ Status
 
 WIP.  Project structure setup.
 Learning http4s/working on server logic.
-Client unimplemented
+Client unimplemented.
+No tests yet.
 
 ```
 sbt client/fullOptJS
