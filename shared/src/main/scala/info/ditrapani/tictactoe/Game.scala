@@ -25,18 +25,22 @@ final case class GameOver(winner: Player, board: Board) extends Game {
 
 sealed abstract class Player {
   def toResponse: String
+  def token: Cell
 }
 object Player1 extends Player {
   override def toString = "Player1"
   def toResponse = "1"
+  def token = X
 }
 object Player2 extends Player {
   override def toString = "Player2"
   def toResponse = "2"
+  def token = O
 }
 object Spectator extends Player {
   override def toString = "Spectator"
   def toResponse = "S"
+  def token = Empty
 }
 
 final case class Board(cells: Vector[Cell]) {
@@ -45,7 +49,7 @@ final case class Board(cells: Vector[Cell]) {
    ${cells(3)} ${cells(4)} ${cells(5)}
    ${cells(6)} ${cells(7)} ${cells(8)}
    """
-   def toResponse: String = cells.map(_.toResponse).mkString
+  def toResponse: String = cells.map(_.toResponse).mkString
 }
 
 object Board {

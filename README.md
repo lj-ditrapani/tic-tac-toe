@@ -61,3 +61,13 @@ Status string: 12 characters with format PSSCCCCCCCCC where
     - E: Empty
     - X: player 1 has an X here
     - O: player 2 has an O here
+
+
+Future
+------
+
+Instead of Player; maybe have Client & Player where
+- Client is (C1, C2, or Spectator)
+- Player is (P1 or P2).
+So when you say Player, you mean an active player.
+When you say Client, you mean spectator or player.

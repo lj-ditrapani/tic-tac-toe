@@ -19,6 +19,7 @@ object Server extends StreamApp[IO] with Http4sDsl[IO] {
   def static(file: String, request: Request[IO]): IO[Response[IO]] =
     StaticFile.fromResource("/" + file, Some(request)).getOrElseF(NotFound())
 
+  @SuppressWarnings(Array("org.wartremover.warts.Throw"))
   val service: HttpService[IO] = HttpService[IO] {
     case request @ GET -> Root =>
       static("index.html", request).map(
@@ -37,11 +38,24 @@ object Server extends StreamApp[IO] with Http4sDsl[IO] {
       static(s"js/$file", request)
     case request @ GET -> Root / "status" =>
       Ok(statusString(getPlayer(request), game))
-    case request @ POST -> Root / "play" / IntVar(x) / IntVar(y) =>
+    case request @ POST -> Root / "play" / IntVar(index) =>
       val player = getPlayer(request)
-      getBoard(game, request) match {
-        case None => Ok(statusString(player, game) + s" not your turn! $x $y")
-        case Some(board) => Ok(statusString(player, game) + s" it was your turn $x $y $board")
+      getBoard(player, game) match {
+        case _ if index < 0 => Ok(statusString(player, game))
+        case _ if index > 8 => Ok(statusString(player, game))
+        case None => Ok(statusString(player, game) + s" not your turn! $index")
+        case Some(board) =>
+          if (board.cells(index) == Empty) {
+            val newBoard = Board(board.cells.updated(index, player.token))
+            game = game match {
+              case Player1Turn(_) => Player2Turn(newBoard)
+              case Player2Turn(_) => Player1Turn(newBoard)
+              case _ => throw new RuntimeException("should be unreachable...")
+            }
+            Ok(statusString(player, game))
+          } else {
+            Ok(statusString(player, game) + s" can't play there! $index")
+          }
       }
   }
 
@@ -59,8 +73,7 @@ object Server extends StreamApp[IO] with Http4sDsl[IO] {
     }
   }
 
-  def getBoard(game: Game, request: Request[IO]): Option[Board] = {
-    val player = getPlayer(request)
+  def getBoard(player: Player, game: Game): Option[Board] = {
     game match {
       case Player1Turn(board) if player == Player1 => Some(board)
       case Player2Turn(board) if player == Player2 => Some(board)
