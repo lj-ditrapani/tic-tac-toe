@@ -13,13 +13,23 @@ object Player1 extends Player {
   override def toString = "Player1"
 }
 object Player2 extends Player {
-  override def toString = "Player1"
+  override def toString = "Player2"
+}
+object Spectator extends Player {
+  override def toString = "Spectator"
 }
 
-final case class Board(cells: Vector[Cell])
+final case class Board(cells: Vector[Cell]) {
+  override def toString = s"""Board
+   ${cells(0)} ${cells(1)} ${cells(2)}
+   ${cells(3)} ${cells(4)} ${cells(5)}
+   ${cells(6)} ${cells(7)} ${cells(8)}
+   """
+}
 
 object Board {
   def init(): Board = create(Vector.fill(9)(Empty))
+
   def create(cells: Vector[Cell]): Board = {
     require(cells.size == 9)
     Board(cells)

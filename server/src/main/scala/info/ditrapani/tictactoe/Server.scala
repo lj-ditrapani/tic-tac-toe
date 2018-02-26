@@ -2,10 +2,9 @@ package info.ditrapani.tictactoe
 
 import cats.effect.IO
 import fs2.StreamApp
-import io.circe._
 import org.http4s._
-import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
+import org.http4s.{Cookie, headers}
 import org.http4s.server.blaze.BlazeBuilder
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Random
@@ -36,12 +35,34 @@ object Server extends StreamApp[IO] with Http4sDsl[IO] {
       )
     case request @ GET -> Root / "js" / file =>
       static(s"js/$file", request)
-    case GET -> Root / "hello" / name =>
-      Ok(Json.obj("message" -> Json.fromString(s"Hello, ${name}")))
-    case GET -> Root / "status" =>
-      Ok(s"current game status is $game")
-    case PUT -> Root / "play" / IntVar(x) / IntVar(y) =>
-      Ok(s"you played on position $x $y")
+    case request @ GET -> Root / "status" =>
+      Ok(s"you are ${getPlayer(request)}; current game status is $game")
+    case request @ PUT -> Root / "play" / IntVar(x) / IntVar(y) =>
+      getBoard(game, request) match {
+        case None => Ok(s"It is not your turn; you played on position $x $y")
+        case Some(board) => Ok(s"It is your turn and you played on position $x $y with $board")
+      }
+  }
+
+  def getPlayer(request: Request[IO]): Player = {
+    val maybeCookie: Option[Cookie] = for {
+      header <- headers.Cookie.from(request.headers)
+      cookie <- header.values.find(_.name == "id")
+    } yield cookie
+    maybeCookie match {
+      case Some(cookie) if cookie.content == p1Id.toString => Player1
+      case Some(cookie) if cookie.content == p2Id.toString => Player2
+      case _ => Spectator
+    }
+  }
+
+  def getBoard(game: Game, request: Request[IO]): Option[Board] = {
+    val player = getPlayer(request)
+    game match {
+      case Player1Turn(board) if player == Player1 => Some(board)
+      case Player2Turn(board) if player == Player2 => Some(board)
+      case _ => None
+    }
   }
 
   def stream(args: List[String], requestShutdown: IO[Unit]) =
