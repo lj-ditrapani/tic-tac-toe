@@ -38,7 +38,7 @@ Endpoints:
     - returns static javascript
 - GET /status
     - returns status string
-- POST /play/x/y
+- POST /play/index
     - current player takes her turn; returns status string
 - POST /reset
     - when in GameOver state, either player can request a new game
@@ -71,3 +71,5 @@ Instead of Player; maybe have Client & Player where
 - Player is (P1 or P2).
 So when you say Player, you mean an active player.
 When you say Client, you mean spectator or player.
+
+- Put game inside an fs2 signal to prevent concurrency bugs and enforce referential transparency.
