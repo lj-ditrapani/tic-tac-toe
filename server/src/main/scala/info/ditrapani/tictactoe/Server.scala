@@ -36,6 +36,8 @@ object Server extends StreamApp[IO] with Http4sDsl[IO] {
       )
     case request @ GET -> Root / "js" / file =>
       static(s"js/$file", request)
+    case request @ GET -> Root / "img" / file =>
+      static(s"img/$file", request)
     case request @ GET -> Root / "status" =>
       Ok(statusString(getPlayer(request), game))
     case request @ POST -> Root / "play" / IntVar(index) =>

@@ -13,7 +13,7 @@ object App {
     import scalatags.JsDom.tags._
     import scalatags.JsDom.{attrs => a}
     import scalatags.JsDom.implicits._
-    val bgImg = "bg.png"
+    val bgImg = "img/bg.png"
 
     val d = div(Styles.body)(
       h1("Tic-tac-toe"),
