@@ -3,12 +3,14 @@ Tic-tac-toe
 
 tic-tac-toe client/server in scala using http4s & scala.js
 
+![client.png](client.png)
+
 Status
 ------
 
-WIP.  Project structure setup.
-Learning http4s/working on server logic.
-Client unimplemented.
+WIP.  Server initial implementation.
+Basic client layout and gui.
+Client main loop missing.
 No tests yet.
 
 ```
@@ -36,6 +38,8 @@ Endpoints:
     - sets cookie id (determines player 1 vs player 2) & returns html
 - GET /js/file
     - returns static javascript
+- GET /img/file
+    - returns static png files
 - GET /status
     - returns status string
 - POST /play/index
