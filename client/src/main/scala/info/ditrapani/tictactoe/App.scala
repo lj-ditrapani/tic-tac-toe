@@ -21,7 +21,7 @@ object App {
         for (x <- 1.to(3))
           yield div(Styles.row)(
             for (y <- 1.to(3))
-              yield div(Styles.box)(img(a.src := bgImg))
+              yield div(Styles.availableBox)(img(a.src := bgImg))
             )
       )
     )
@@ -39,23 +39,30 @@ object Styles extends StyleSheet {
   import scalatags.JsDom.implicits._
   initStyleSheet()
 
-  val box = cls(
+  val unavailableBox = cls(
     s.display := "inline-block",
     s.backgroundColor := "white",
     s.height := 128,
     s.width := 128,
-    s.margin := 2
+    s.border := "2px solid white",
   )
+
+  val availableBox = cls(
+    unavailableBox.splice,
+    &.hover(
+      s.borderColor := "red"
+    )
+  )
+
 
   val row = cls(
     s.height := 132,
-    s.width := 396,
-    s.padding := "0px 2px"
+    s.width := 396
   )
 
   val frame = cls(
-    s.width := 400,
-    s.padding := "2px 0px"
+    s.width := 396,
+    s.padding := 2
   )
 
   val body = cls()
