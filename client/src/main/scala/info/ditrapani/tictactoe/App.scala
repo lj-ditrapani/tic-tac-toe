@@ -1,11 +1,21 @@
 package info.ditrapani.tictactoe
 
 import org.scalajs.jquery.jQuery
+import fr.hmil.roshttp.HttpRequest
 
 object App {
   def main(args: Array[String]): Unit = {
-    println("Hello world!")
     jQuery(() => setupUI())
+    import monix.execution.Scheduler.Implicits.global
+    HttpRequest()
+      .withHost("localhost")
+      .withPort(8080)
+      .withPath("/status")
+      .send()
+      .map(r => {
+        val status = r.body
+        println(status)
+      })
     (): Unit
   }
 
@@ -17,11 +27,14 @@ object App {
 
     val d = div(Styles.body)(
       h1("Tic-tac-toe"),
+      p(a.id := "player")("Player Unknown"),
+      p(a.id := "message")("Loading..."),
       div(Styles.frame)(
         for (x <- 1.to(3))
-          yield div(Styles.row)(
-            for (y <- 1.to(3))
-              yield div(Styles.availableBox)(img(a.src := bgImg))
+          yield
+            div(Styles.row)(
+              for (y <- 1.to(3))
+                yield div(Styles.availableBox)(img(a.src := bgImg))
             )
       )
     )
@@ -53,7 +66,6 @@ object Styles extends StyleSheet {
       s.borderColor := "red"
     )
   )
-
 
   val row = cls(
     s.height := 132,

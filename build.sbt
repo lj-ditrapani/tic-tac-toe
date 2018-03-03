@@ -49,9 +49,10 @@ lazy val client = project
     commonSettings,
     scalaJSUseMainModuleInitializer := true,
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "0.9.4",
       "be.doeraene" %%% "scalajs-jquery" % "0.9.2",
       "com.lihaoyi" %%% "scalatags" % "0.6.7",
+      "fr.hmil" %%% "roshttp" % "2.1.0",
+      "org.scala-js" %%% "scalajs-dom" % "0.9.4",
       // test
       "org.scalatest" %%% "scalatest" % "3.0.5" % "test"
     ),
