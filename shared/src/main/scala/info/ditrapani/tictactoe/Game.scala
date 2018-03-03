@@ -23,6 +23,19 @@ final case class GameOver(winner: Player, board: Board) extends Game {
   def toResponse = "G" + winner.toResponse + board.toResponse
 }
 
+object Game {
+  def fromStatusString(status: String): Game =
+    status.substring(1, 3) match {
+      case "IN" => Init
+      case "R1" => Player1Ready
+      case "R2" => Player2Ready
+      case "T1" => Player1Turn(Board.fromStatusString(status))
+      case "T2" => Player2Turn(Board.fromStatusString(status))
+      case "G1" => GameOver(Player1, Board.fromStatusString(status))
+      case "G2" => GameOver(Player2, Board.fromStatusString(status))
+    }
+}
+
 sealed abstract class Player {
   def toResponse: String
   def token: Cell
@@ -42,6 +55,16 @@ object Spectator extends Player {
   def toResponse = "S"
   def token = Empty
 }
+object Player {
+  @SuppressWarnings(Array("org.wartremover.warts.Throw"))
+  def fromStatusString(status: String): Player =
+    status(0) match {
+      case '1' => Player1
+      case '2' => Player2
+      case 'S' => Spectator
+      case char => throw new IllegalArgumentException(s"Uknown player char $char")
+    }
+}
 
 final case class Board(cells: Vector[Cell]) {
   override def toString = s"""Board
@@ -59,6 +82,9 @@ object Board {
     require(cells.size == 9)
     Board(cells)
   }
+
+  def fromStatusString(status: String): Board =
+    Board.create(status.substring(3, 12).map(Cell.fromChar).toVector)
 }
 
 sealed abstract class Cell {
@@ -75,4 +101,14 @@ object X extends Cell {
 object O extends Cell {
   override def toString = "OCell"
   def toResponse = "O"
+}
+object Cell {
+  @SuppressWarnings(Array("org.wartremover.warts.Throw"))
+  def fromChar(c: Char): Cell =
+    c match {
+      case 'E' => Empty
+      case 'X' => X
+      case 'O' => O
+      case x => throw new IllegalArgumentException(s"Unknown Cell char $x")
+    }
 }
