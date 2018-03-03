@@ -14,6 +14,8 @@ object Server extends StreamApp[IO] with Http4sDsl[IO] {
   private val p2Id = Random.nextInt()
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   var game: Game = Init
+  @SuppressWarnings(Array("org.wartremover.warts.Var"))
+  var firstPlayer: Player = Player1
 
   @SuppressWarnings(Array("org.wartremover.warts.Nothing"))
   def static(file: String, request: Request[IO]): IO[Response[IO]] =
@@ -59,6 +61,21 @@ object Server extends StreamApp[IO] with Http4sDsl[IO] {
             Ok(statusString(player, game) + s" can't play there! $index")
           }
       }
+    case request @ GET -> Root / "reset" => {
+      val player = getPlayer(request)
+      game match {
+        case GameOver(_, _) if player != Spectator =>
+          firstPlayer = firstPlayer.toggle
+          game = player match {
+            case Player1 => Player1Ready
+            case Player2 => Player2Ready
+            case Spectator =>
+              throw new IllegalStateException("Guard clause should prevent Spectator case")
+          }
+          Ok(statusString(player, game))
+        case _ => Ok(statusString(player, game))
+      }
+    }
   }
 
   def statusString(player: Player, game: Game): String = player.toResponse + game.toResponse

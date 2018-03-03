@@ -68,21 +68,27 @@ object Game {
 sealed abstract class Player {
   def toResponse: String
   def token: Cell
+  def toggle: Player
 }
 object Player1 extends Player {
   override def toString = "Player 1"
   def toResponse = "1"
   def token = X
+  def toggle = Player2
 }
 object Player2 extends Player {
   override def toString = "Player 2"
   def toResponse = "2"
   def token = O
+  def toggle = Player1
 }
 object Spectator extends Player {
   override def toString = "a Spectator"
   def toResponse = "S"
   def token = Empty
+  @SuppressWarnings(Array("org.wartremover.warts.Throw"))
+  def toggle: Player =
+    throw new RuntimeException("toggle should only be called on Player1 or Player2")
 }
 object Player {
   @SuppressWarnings(Array("org.wartremover.warts.Throw"))
