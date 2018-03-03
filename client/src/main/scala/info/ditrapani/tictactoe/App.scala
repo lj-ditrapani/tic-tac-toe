@@ -15,26 +15,43 @@ object App {
       .map(r => {
         val status = r.body
         println(status)
+        val player = Player.fromStatusString(status)
+        val game = Game.fromStatusString(status)
+        jQuery("#player").text(s"You are $player")
+        jQuery("#message").text(s"$game")
+        println(s"$player  $game")
       })
     (): Unit
   }
 
+  def click(id: String)(): Unit = {
+    jQuery(s"#$id").attr("src", "img/ex.png")
+    (): Unit
+  }
+
   def setupUI(): Unit = {
-    import scalatags.JsDom.tags._
-    import scalatags.JsDom.{attrs => a}
-    import scalatags.JsDom.implicits._
+    import scalatags.JsDom.all._
     val bgImg = "img/bg.png"
 
     val d = div(Styles.body)(
       h1("Tic-tac-toe"),
-      p(a.id := "player")("Player Unknown"),
-      p(a.id := "message")("Loading..."),
+      p(id := "player")("Player Unknown"),
+      p(id := "message")("Loading..."),
       div(Styles.frame)(
         for (x <- 1.to(3))
           yield
             div(Styles.row)(
               for (y <- 1.to(3))
-                yield div(Styles.availableBox)(img(a.src := bgImg))
+                yield {
+                  val index = (x - 1) * 3 + y
+                  val boxId = s"box$index"
+                  val imgId = s"img$index"
+                  val clickAttr = onclick := { () =>
+                    click(imgId)()
+                  }
+                  val image = img(id := imgId, src := bgImg)
+                  div(id := boxId, Styles.availableBox, clickAttr)(image)
+                }
             )
       )
     )
