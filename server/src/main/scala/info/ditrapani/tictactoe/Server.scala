@@ -8,12 +8,16 @@ import org.http4s.{Cookie, headers}
 import org.http4s.server.blaze.BlazeBuilder
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Random
+import state.{Board, Player, Player1, Player2, Spectator}
+import state.game
+import game.Game
+import state.cell
 
 object Server extends StreamApp[IO] with Http4sDsl[IO] {
   private val p1Id = Random.nextInt()
   private val p2Id = Random.nextInt()
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
-  var game: Game = Init
+  var gameState: Game = game.Init
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   var firstPlayer: Player = Player1
 
@@ -26,12 +30,12 @@ object Server extends StreamApp[IO] with Http4sDsl[IO] {
     case request @ GET -> Root =>
       static("index.html", request).map(
         response =>
-          game match {
-            case Init =>
-              game = Player1Ready
+          gameState match {
+            case game.Init =>
+              gameState = game.Player1Ready
               response.addCookie(Cookie("id", p1Id.toString))
-            case Player1Ready =>
-              game = Player1Turn(Board.init())
+            case game.Player1Ready =>
+              gameState = game.Player1Turn(Board.init())
               response.addCookie(Cookie("id", p2Id.toString))
             case _ => response
         }
@@ -41,44 +45,45 @@ object Server extends StreamApp[IO] with Http4sDsl[IO] {
     case request @ GET -> Root / "img" / file =>
       static(s"img/$file", request)
     case request @ GET -> Root / "status" =>
-      Ok(statusString(getPlayer(request), game))
+      Ok(statusString(getPlayer(request), gameState))
     case request @ POST -> Root / "play" / IntVar(index) =>
       val player = getPlayer(request)
-      getBoard(player, game) match {
-        case _ if index < 0 => Ok(statusString(player, game))
-        case _ if index > 8 => Ok(statusString(player, game))
-        case None => Ok(statusString(player, game) + s" not your turn! $index")
+      getBoard(player, gameState) match {
+        case _ if index < 0 => Ok(statusString(player, gameState))
+        case _ if index > 8 => Ok(statusString(player, gameState))
+        case None => Ok(statusString(player, gameState) + s" not your turn! $index")
         case Some(board) =>
-          if (board.cells(index) == Empty) {
+          if (board.cells(index) == cell.Empty) {
             val newBoard = Board(board.cells.updated(index, player.token))
-            game = game match {
-              case Player1Turn(_) => Player2Turn(newBoard)
-              case Player2Turn(_) => Player1Turn(newBoard)
+            gameState = gameState match {
+              case game.Player1Turn(_) => game.Player2Turn(newBoard)
+              case game.Player2Turn(_) => game.Player1Turn(newBoard)
               case _ => throw new RuntimeException("should be unreachable...")
             }
-            Ok(statusString(player, game))
+            Ok(statusString(player, gameState))
           } else {
-            Ok(statusString(player, game) + s" can't play there! $index")
+            Ok(statusString(player, gameState) + s" can't play there! $index")
           }
       }
     case request @ GET -> Root / "reset" => {
       val player = getPlayer(request)
-      game match {
-        case GameOver(_, _) if player != Spectator =>
+      gameState match {
+        case game.GameOver(_, _) if player != Spectator =>
           firstPlayer = firstPlayer.toggle
-          game = player match {
-            case Player1 => Player1Ready
-            case Player2 => Player2Ready
+          gameState = player match {
+            case Player1 => game.Player1Ready
+            case Player2 => game.Player2Ready
             case Spectator =>
               throw new IllegalStateException("Guard clause should prevent Spectator case")
           }
-          Ok(statusString(player, game))
-        case _ => Ok(statusString(player, game))
+          Ok(statusString(player, gameState))
+        case _ => Ok(statusString(player, gameState))
       }
     }
   }
 
-  def statusString(player: Player, game: Game): String = player.toResponse + game.toResponse
+  def statusString(player: Player, gameState: Game): String =
+    player.toResponse + gameState.toResponse
 
   def getPlayer(request: Request[IO]): Player = {
     val maybeCookie: Option[Cookie] = for {
@@ -92,10 +97,10 @@ object Server extends StreamApp[IO] with Http4sDsl[IO] {
     }
   }
 
-  def getBoard(player: Player, game: Game): Option[Board] = {
-    game match {
-      case Player1Turn(board) if player == Player1 => Some(board)
-      case Player2Turn(board) if player == Player2 => Some(board)
+  def getBoard(player: Player, gameState: Game): Option[Board] = {
+    gameState match {
+      case game.Player1Turn(board) if player == Player1 => Some(board)
+      case game.Player2Turn(board) if player == Player2 => Some(board)
       case _ => None
     }
   }
