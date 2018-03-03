@@ -15,6 +15,11 @@ lazy val commonSettings = Seq(
     "-Ywarn-value-discard",
     "-Xfuture"
   ),
+  libraryDependencies ++= Seq(
+    // test
+    "org.mockito" % "mockito-core" % "2.15.0" % "test",
+    "org.scalatest" %% "scalatest" % "3.0.5" % "test"
+  ),
   wartremoverWarnings ++= Warts.allBut(
     Wart.Equals,
     Wart.NonUnitStatements
@@ -33,12 +38,8 @@ lazy val server = project
     commonSettings,
     libraryDependencies ++= Seq(
       "org.http4s" %% "http4s-blaze-server" % Http4sVersion,
-      "org.http4s" %% "http4s-circe" % Http4sVersion,
       "org.http4s" %% "http4s-dsl" % Http4sVersion,
-      "ch.qos.logback" % "logback-classic" % "1.2.3",
-      // test
-      "org.mockito" % "mockito-core" % "2.15.0" % "test",
-      "org.scalatest" %% "scalatest" % "3.0.5" % "test"
+      "ch.qos.logback" % "logback-classic" % "1.2.3"
     )
   )
   .dependsOn(sharedJvm)
@@ -52,9 +53,7 @@ lazy val client = project
       "be.doeraene" %%% "scalajs-jquery" % "0.9.2",
       "com.lihaoyi" %%% "scalatags" % "0.6.7",
       "fr.hmil" %%% "roshttp" % "2.1.0",
-      "org.scala-js" %%% "scalajs-dom" % "0.9.4",
-      // test
-      "org.scalatest" %%% "scalatest" % "3.0.5" % "test"
+      "org.scala-js" %%% "scalajs-dom" % "0.9.4"
     ),
     skip in packageJSDependencies := false,
     jsDependencies += "org.webjars" % "jquery" % "3.2.1" / "3.2.1/jquery.js",

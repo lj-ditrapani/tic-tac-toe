@@ -55,7 +55,7 @@ object App {
             )
       )
     )
-    jQuery(s"<style>${Styles.styleSheetText}</style>").appendTo("head")
+    jQuery("head").append(s"<style>${Styles.styleSheetText}</style>")
     jQuery("body").append(d.render)
     (): Unit
   }
