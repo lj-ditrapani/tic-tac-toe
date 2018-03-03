@@ -3,24 +3,39 @@ package info.ditrapani.tictactoe
 sealed abstract class Game {
   val emptyBoard = "EEEEEEEEE"
   def toResponse: String
+  def toMessage(player: Player): String
 }
 object Init extends Game {
   def toResponse = "IN" + emptyBoard
+  def toMessage(player: Player) = "No players have joined yet..."
 }
 object Player1Ready extends Game {
   def toResponse = "R1" + emptyBoard
+  def toMessage(player: Player) = Game.playerReadyMessage(player, 1, 2)
 }
 object Player2Ready extends Game {
   def toResponse = "R2" + emptyBoard
+  def toMessage(player: Player) = Game.playerReadyMessage(player, 2, 1)
 }
 final case class Player1Turn(board: Board) extends Game {
   def toResponse = "T1" + board.toResponse
+  def toMessage(player: Player) = Game.playerTurnMessage(player, Player1, 1)
 }
 final case class Player2Turn(board: Board) extends Game {
   def toResponse = "T2" + board.toResponse
+  def toMessage(player: Player) = Game.playerTurnMessage(player, Player2, 2)
 }
 final case class GameOver(winner: Player, board: Board) extends Game {
   def toResponse = "G" + winner.toResponse + board.toResponse
+  def toMessage(player: Player) =
+    player == Spectator match {
+      case true => s"$winner won"
+      case false =>
+        winner == player match {
+          case true => "You win!"
+          case false => "You loose :("
+        }
+    }
 }
 
 object Game {
@@ -34,6 +49,20 @@ object Game {
       case "G1" => GameOver(Player1, Board.fromStatusString(status))
       case "G2" => GameOver(Player2, Board.fromStatusString(status))
     }
+
+  def playerReadyMessage(player: Player, ready: Int, waiting: Int): String =
+    player match {
+      case Spectator => s"Player $ready has joined.  " + waitingMessage(waiting)
+      case _ => waitingMessage(waiting)
+    }
+
+  def playerTurnMessage(player: Player, turnPlayer: Player, turn: Int): String =
+    player == turnPlayer match {
+      case true => "Your turn"
+      case false => s"Player $turn's turn"
+    }
+
+  private def waitingMessage(waiting: Int): String = s"Waiting for Player $waiting to join"
 }
 
 sealed abstract class Player {
@@ -41,17 +70,17 @@ sealed abstract class Player {
   def token: Cell
 }
 object Player1 extends Player {
-  override def toString = "Player1"
+  override def toString = "Player 1"
   def toResponse = "1"
   def token = X
 }
 object Player2 extends Player {
-  override def toString = "Player2"
+  override def toString = "Player 2"
   def toResponse = "2"
   def token = O
 }
 object Spectator extends Player {
-  override def toString = "Spectator"
+  override def toString = "a Spectator"
   def toResponse = "S"
   def token = Empty
 }

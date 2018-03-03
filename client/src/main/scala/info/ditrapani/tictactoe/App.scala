@@ -18,7 +18,7 @@ object App {
         val player = Player.fromStatusString(status)
         val game = Game.fromStatusString(status)
         jQuery("#player").text(s"You are $player")
-        jQuery("#message").text(s"$game")
+        jQuery("#message").text(s"${game.toMessage(player)}")
         println(s"$player  $game")
       })
     (): Unit
