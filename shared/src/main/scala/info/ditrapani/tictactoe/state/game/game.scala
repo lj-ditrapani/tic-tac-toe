@@ -4,32 +4,38 @@ import info.ditrapani.tictactoe.state
 import state.{Board, Player, Player1, Player2, Spectator}
 
 sealed abstract class Game {
-  val emptyBoard = "EEEEEEEEE"
   def toResponse: String
+  def toString: String
   def toMessage(player: Player): String
 }
 object Init extends Game {
-  def toResponse = "IN" + emptyBoard
+  def toResponse = "IN" + Game.emptyBoard
+  override def toString = "game.Init"
   def toMessage(player: Player) = "No players have joined yet..."
 }
 object Player1Ready extends Game {
-  def toResponse = "R1" + emptyBoard
+  def toResponse = "R1" + Game.emptyBoard
+  override def toString = "game.Player1Ready"
   def toMessage(player: Player) = Game.playerReadyMessage(player, 1, 2)
 }
 object Player2Ready extends Game {
-  def toResponse = "R2" + emptyBoard
+  def toResponse = "R2" + Game.emptyBoard
+  override def toString = "game.Player2Ready"
   def toMessage(player: Player) = Game.playerReadyMessage(player, 2, 1)
 }
 final case class Player1Turn(board: Board) extends Game {
   def toResponse = "T1" + board.toResponse
+  override def toString = s"game.Player1Turn $board"
   def toMessage(player: Player) = Game.playerTurnMessage(player, Player1, 1)
 }
 final case class Player2Turn(board: Board) extends Game {
   def toResponse = "T2" + board.toResponse
+  override def toString = s"game.Player2Turn $board"
   def toMessage(player: Player) = Game.playerTurnMessage(player, Player2, 2)
 }
 final case class GameOver(winner: Player, board: Board) extends Game {
   def toResponse = "G" + winner.toResponse + board.toResponse
+  override def toString = s"game.GameOver $winner $board"
   def toMessage(player: Player) =
     player == Spectator match {
       case true => s"$winner won"
@@ -42,7 +48,10 @@ final case class GameOver(winner: Player, board: Board) extends Game {
 }
 
 object Game {
-  def fromStatusString(status: String): Game =
+  val emptyBoard = "EEEEEEEEE"
+
+  def fromStatusString(status: String): Game = {
+    require(status.length == 12)
     status.substring(1, 3) match {
       case "IN" => Init
       case "R1" => Player1Ready
@@ -51,7 +60,9 @@ object Game {
       case "T2" => Player2Turn(Board.fromStatusString(status))
       case "G1" => GameOver(Player1, Board.fromStatusString(status))
       case "G2" => GameOver(Player2, Board.fromStatusString(status))
+      case _ => throw new IllegalArgumentException(s"Unknown game status in $status")
     }
+  }
 
   def playerReadyMessage(player: Player, ready: Int, waiting: Int): String =
     player match {

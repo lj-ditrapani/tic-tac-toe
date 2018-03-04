@@ -4,7 +4,7 @@ sealed abstract class Cell {
   def toResponse: String
 }
 object Empty extends Cell {
-  override def toString = "EmptyCell"
+  override def toString = "ECell"
   def toResponse = "E"
 }
 object X extends Cell {
