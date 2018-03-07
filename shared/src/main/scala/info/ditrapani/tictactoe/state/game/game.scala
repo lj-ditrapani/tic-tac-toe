@@ -50,6 +50,7 @@ final case class GameOver(winner: Player, board: Board) extends Game {
 object Game {
   val emptyBoard = "EEEEEEEEE"
 
+  @SuppressWarnings(Array("org.wartremover.warts.Throw"))
   def fromStatusString(status: String): Game = {
     require(status.length == 12)
     status.substring(1, 3) match {

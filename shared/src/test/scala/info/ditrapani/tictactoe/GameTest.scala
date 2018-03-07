@@ -1,7 +1,7 @@
 package info.ditrapani.tictactoe.state.game
 
 import info.ditrapani.tictactoe.Spec
-import info.ditrapani.tictactoe.state.{Board, Player1, Player2}
+import info.ditrapani.tictactoe.state.{Board, Player1, Player2, Spectator}
 
 class GameTest extends Spec {
   private val boardT1 = "2T1XXXOOOXXX"
@@ -50,6 +50,25 @@ class GameTest extends Spec {
     for ((game, status) <- tests) {
       s"given $game returns $status" in {
         game.toResponse shouldBe status
+      }
+    }
+  }
+
+  "toMessage" - {
+    val tests = List(
+      (Init, Player1, "No players have joined yet..."),
+      (Player1Ready, Player1, "Waiting for Player 2 to join"),
+      (Player1Ready, Spectator, "Player 1 has joined.  Waiting for Player 2 to join"),
+      (Player2Ready, Player1, "Waiting for Player 1 to join"),
+      (Player1Turn(Board.fromStatusString(boardT1)), Player1, "Your turn"),
+      (Player2Turn(Board.fromStatusString(boardT2)), Player1, "Player 2's turn"),
+      (GameOver(Player1, Board.fromStatusString(boardG1)), Spectator, "Player 1 won"),
+      (GameOver(Player1, Board.fromStatusString(boardG1)), Player1, "You win!"),
+      (GameOver(Player2, Board.fromStatusString(boardG2)), Player1, "You loose :(")
+    )
+    for ((game, player, message) <- tests) {
+      s"given player: $player and $game returns $message" in {
+        game.toMessage(player) shouldBe message
       }
     }
   }
