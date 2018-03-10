@@ -39,7 +39,6 @@ class PlayerTest extends Spec {
     }
   }
 
-
   "fromStatusString" - {
     val tests = List(
       ("1", Player1),

@@ -8,7 +8,7 @@ class CellTest extends Spec {
     (X, "XCell", "X"),
     (O, "OCell", "O")
   )
-  
+
   for ((cell, string, response) <- tests) {
     s"$cell.toString returns $string" in {
       cell.toString shouldBe string
@@ -23,7 +23,7 @@ class CellTest extends Spec {
       ('E', Empty),
       ('X', X),
       ('O', O)
-      )
+    )
 
     for ((char, cell) <- tests) {
       s"given $char returns $cell" in {

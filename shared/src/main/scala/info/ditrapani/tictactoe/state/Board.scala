@@ -12,13 +12,15 @@ final case class Board(cells: Vector[Cell]) {
 }
 
 object Board {
-  def init(): Board = create(Vector.fill(9)(cell.Empty))
+  val init: Board = create(Vector.fill(9)(cell.Empty))
 
   def create(cells: Vector[Cell]): Board = {
     require(cells.size == 9)
     Board(cells)
   }
 
-  def fromStatusString(status: String): Board =
+  def fromStatusString(status: String): Board = {
+    require(status.size == 12)
     Board.create(status.substring(3, 12).map(Cell.fromChar).toVector)
+  }
 }
