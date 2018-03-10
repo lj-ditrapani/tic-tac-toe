@@ -35,7 +35,7 @@ object Server extends StreamApp[IO] with Http4sDsl[IO] {
               gameState = game.Player1Ready
               response.addCookie(Cookie("id", p1Id.toString))
             case game.Player1Ready =>
-              gameState = game.Player1Turn(Board.init())
+              gameState = game.Player1Turn(Board.init)
               response.addCookie(Cookie("id", p2Id.toString))
             case _ => response
         }
