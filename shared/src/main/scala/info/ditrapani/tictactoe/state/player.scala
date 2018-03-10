@@ -19,21 +19,12 @@ object Player2 extends Player {
   def token = cell.O
   def toggle = Player1
 }
-object Spectator extends Player {
-  override def toString = "a Spectator"
-  def toResponse = "S"
-  def token = cell.Empty
-  @SuppressWarnings(Array("org.wartremover.warts.Throw"))
-  def toggle: Player =
-    throw new RuntimeException("toggle should only be called on Player1 or Player2")
-}
 object Player {
   @SuppressWarnings(Array("org.wartremover.warts.Throw"))
   def fromStatusString(status: String): Player =
     status(0) match {
       case '1' => Player1
       case '2' => Player2
-      case 'S' => Spectator
       case char => throw new IllegalArgumentException(s"Uknown player char $char")
     }
 }

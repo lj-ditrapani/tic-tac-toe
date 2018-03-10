@@ -17,11 +17,11 @@ object App {
       .map(r => {
         val status = r.body
         println(status)
-        val player = Player.fromStatusString(status)
+        val entity = Entity.fromStatusString(status)
         val game = Game.fromStatusString(status)
-        jQuery("#player").text(s"You are $player")
-        jQuery("#message").text(s"${game.toMessage(player)}")
-        println(s"$player  $game")
+        jQuery("#entity").text(s"You are $entity")
+        jQuery("#message").text(s"${game.toMessage(entity)}")
+        println(s"$entity  $game")
       })
     (): Unit
   }
@@ -37,7 +37,7 @@ object App {
 
     val d = div(Styles.body)(
       h1("Tic-tac-toe"),
-      p(id := "player")("Player Unknown"),
+      p(id := "entity")("Player Unknown"),
       p(id := "message")("Loading..."),
       div(Styles.frame)(
         for (x <- 1.to(3))
