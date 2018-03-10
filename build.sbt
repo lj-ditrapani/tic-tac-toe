@@ -61,3 +61,7 @@ lazy val client = project
   )
   .enablePlugins(ScalaJSPlugin)
   .dependsOn(sharedJs)
+
+commands += Command.command("checkCoverage") { state =>
+  "coverage" :: "sharedJVM/clean" :: "sharedJVM/test" :: "coverageReport" :: state
+}
