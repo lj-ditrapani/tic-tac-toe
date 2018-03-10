@@ -8,7 +8,7 @@ import org.http4s.{Cookie, headers}
 import org.http4s.server.blaze.BlazeBuilder
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Random
-import state.{Board, Player, Player1, Player2, Spectator}
+import state.{Actor, Board, Entity, Player, Player1, Player2, Spectator}
 import state.game
 import game.Game
 import state.cell
@@ -45,54 +45,59 @@ object Server extends StreamApp[IO] with Http4sDsl[IO] {
     case request @ GET -> Root / "img" / file =>
       static(s"img/$file", request)
     case request @ GET -> Root / "status" =>
-      Ok(statusString(getPlayer(request), gameState))
+      Ok(statusString(getEntity(request), gameState))
     case request @ POST -> Root / "play" / IntVar(index) =>
-      val player = getPlayer(request)
-      getBoard(player, gameState) match {
-        case _ if index < 0 => Ok(statusString(player, gameState))
-        case _ if index > 8 => Ok(statusString(player, gameState))
-        case None => Ok(statusString(player, gameState) + s" not your turn! $index")
-        case Some(board) =>
-          if (board.cells(index) == cell.Empty) {
-            val newBoard = Board(board.cells.updated(index, player.token))
-            gameState = gameState match {
-              case game.Player1Turn(_) => game.Player2Turn(newBoard)
-              case game.Player2Turn(_) => game.Player1Turn(newBoard)
-              case _ => throw new RuntimeException("should be unreachable...")
-            }
-            Ok(statusString(player, gameState))
-          } else {
-            Ok(statusString(player, gameState) + s" can't play there! $index")
+      val entity = getEntity(request)
+      entity match {
+        case Actor(player) =>
+          getBoard(player, gameState) match {
+            case _ if index < 0 => Ok(statusString(entity, gameState))
+            case _ if index > 8 => Ok(statusString(entity, gameState))
+            case None => Ok(statusString(entity, gameState) + s" not your turn! $index")
+            case Some(board) =>
+              if (board.cells(index) == cell.Empty) {
+                val newBoard = Board(board.cells.updated(index, player.token))
+                gameState = gameState match {
+                  case game.Player1Turn(_) => game.Player2Turn(newBoard)
+                  case game.Player2Turn(_) => game.Player1Turn(newBoard)
+                  case _ => throw new RuntimeException("should be unreachable...")
+                }
+                Ok(statusString(entity, gameState))
+              } else {
+                Ok(statusString(entity, gameState) + s" can't play there! $index")
+              }
           }
+        case Spectator =>
+          Ok(statusString(Spectator, gameState))
       }
     case request @ GET -> Root / "reset" => {
-      val player = getPlayer(request)
+      val entity = getEntity(request)
       gameState match {
-        case game.GameOver(_, _) if player != Spectator =>
+        case game.GameOver(_, _) if entity != Spectator =>
           firstPlayer = firstPlayer.toggle
-          gameState = player match {
-            case Player1 => game.Player1Ready
-            case Player2 => game.Player2Ready
+          gameState = entity match {
+            case Actor(Player1) => game.Player1Ready
+            case Actor(Player2) => game.Player2Ready
             case Spectator =>
               throw new IllegalStateException("Guard clause should prevent Spectator case")
           }
-          Ok(statusString(player, gameState))
-        case _ => Ok(statusString(player, gameState))
+          Ok(statusString(entity, gameState))
+        case _ => Ok(statusString(entity, gameState))
       }
     }
   }
 
-  def statusString(player: Player, gameState: Game): String =
-    player.toResponse + gameState.toResponse
+  def statusString(entity: Entity, gameState: Game): String =
+    entity.toResponse + gameState.toResponse
 
-  def getPlayer(request: Request[IO]): Player = {
+  def getEntity(request: Request[IO]): Entity = {
     val maybeCookie: Option[Cookie] = for {
       header <- headers.Cookie.from(request.headers)
       cookie <- header.values.find(_.name == "id")
     } yield cookie
     maybeCookie match {
-      case Some(cookie) if cookie.content == p1Id.toString => Player1
-      case Some(cookie) if cookie.content == p2Id.toString => Player2
+      case Some(cookie) if cookie.content == p1Id.toString => Actor.player1
+      case Some(cookie) if cookie.content == p2Id.toString => Actor.player2
       case _ => Spectator
     }
   }

@@ -3,7 +3,7 @@ package info.ditrapani.tictactoe
 import org.scalajs.jquery.jQuery
 import fr.hmil.roshttp.HttpRequest
 import state.game.Game
-import state.Player
+import state.Entity
 
 object App {
   def main(args: Array[String]): Unit = {
