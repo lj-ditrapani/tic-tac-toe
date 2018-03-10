@@ -14,6 +14,9 @@ Client main loop missing.
 Shared code fully tested.
 No client or server tests yet.
 
+Run it!
+-------
+
 ```
 sbt client/fullOptJS
 bash copy.sh
