@@ -2,7 +2,7 @@ package info.ditrapani.tictactoe
 
 import cats.effect.IO
 import fs2.StreamApp
-import org.http4s._
+import org.http4s.{HttpService, Request, Response, StaticFile}
 import org.http4s.dsl.Http4sDsl
 import org.http4s.{Cookie, headers}
 import org.http4s.server.blaze.BlazeBuilder
