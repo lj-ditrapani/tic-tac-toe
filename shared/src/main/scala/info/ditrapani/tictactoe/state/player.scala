@@ -3,6 +3,7 @@ package info.ditrapani.tictactoe.state
 import cell.Cell
 
 sealed abstract class Player {
+  def toString: String
   def toResponse: String
   def token: Cell
   def toggle: Player

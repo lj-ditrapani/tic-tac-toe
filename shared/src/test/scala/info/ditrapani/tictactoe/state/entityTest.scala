@@ -20,7 +20,7 @@ class EntityTest extends Spec {
   "Actor" - {
     "containing Player1" - {
       "toString returns string representation" in {
-        Actor.player1.toString shouldBe "Actor Player 1"
+        Actor.player1.toString shouldBe "Player 1"
       }
 
       "toResponse returns response entity string" in {
@@ -34,7 +34,7 @@ class EntityTest extends Spec {
 
     "containing Player2" - {
       "toString returns string representation" in {
-        Actor.player2.toString shouldBe "Actor Player 2"
+        Actor.player2.toString shouldBe "Player 2"
       }
 
       "toResponse returns response entity string" in {

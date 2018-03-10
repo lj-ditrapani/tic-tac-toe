@@ -22,7 +22,8 @@ lazy val commonSettings = Seq(
   ),
   wartremoverWarnings ++= Warts.allBut(
     Wart.Equals,
-    Wart.NonUnitStatements
+    Wart.NonUnitStatements,
+    Wart.ToString
   )
 )
 
