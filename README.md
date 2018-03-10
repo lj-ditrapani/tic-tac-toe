@@ -11,7 +11,8 @@ Status
 WIP.  Server initial implementation.
 Basic client layout and gui.
 Client main loop missing.
-No tests yet.
+Shared code fully tested.
+No client or server tests yet.
 
 ```
 sbt client/fullOptJS
@@ -67,13 +68,7 @@ Status string: 12 characters with format PSSCCCCCCCCC where
     - O: player 2 has an O here
 
 
-Future
-------
-
-Instead of Player; maybe have Client & Player where
-- Client is (C1, C2, or Spectator)
-- Player is (P1 or P2).
-So when you say Player, you mean an active player.
-When you say Client, you mean spectator or player.
+TODO
+----
 
 - Put game inside an fs2 signal to prevent concurrency bugs and enforce referential transparency.
