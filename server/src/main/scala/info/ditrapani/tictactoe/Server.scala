@@ -1,25 +1,21 @@
 package info.ditrapani.tictactoe
 
 import cats.effect.IO
-import fs2.StreamApp
 import org.http4s.{HttpService, Request, Response, StaticFile}
 import org.http4s.dsl.Http4sDsl
 import org.http4s.{Cookie, headers}
-import org.http4s.server.blaze.BlazeBuilder
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.Random
 import state.{Actor, Board, Entity, Player, Player1, Player2, Spectator}
 import state.game
 import game.Game
 import state.cell
 
-object Server extends StreamApp[IO] with Http4sDsl[IO] {
-  private val p1Id = Random.nextInt()
-  private val p2Id = Random.nextInt()
+class Server(state: ServerState) extends Http4sDsl[IO] {
+  private val p1Id = state.p1Id
+  private val p2Id = state.p2Id
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
-  var gameState: Game = game.Init
+  var gameState: Game = state.game
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
-  var firstPlayer: Player = Player1
+  var firstPlayer: Player = state.firstPlayer
 
   @SuppressWarnings(Array("org.wartremover.warts.Nothing"))
   def static(file: String, request: Request[IO]): IO[Response[IO]] =
@@ -109,10 +105,4 @@ object Server extends StreamApp[IO] with Http4sDsl[IO] {
       case _ => None
     }
   }
-
-  def stream(args: List[String], requestShutdown: IO[Unit]) =
-    BlazeBuilder[IO]
-      .bindHttp(8080, "0.0.0.0")
-      .mountService(service, "/")
-      .serve
 }
