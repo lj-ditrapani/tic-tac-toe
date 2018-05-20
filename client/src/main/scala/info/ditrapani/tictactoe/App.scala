@@ -7,8 +7,8 @@ import state.game.Game
 import state.Entity
 
 object App {
-  val host = document.location.host.split(":")(0)
-  val port = document.location.host.split(":")(1).toInt
+  val host: String = document.location.host.split(":")(0)
+  val port: Int = document.location.host.split(":")(1).toInt
 
   def main(args: Array[String]): Unit = {
     jQuery(() => setupUI())

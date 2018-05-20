@@ -1,7 +1,7 @@
 lazy val commonSettings = Seq(
   organization := "info.ditrapani",
   version := "0.0.1",
-  scalaVersion := "2.12.4",
+  scalaVersion := "2.12.6",
   scalacOptions ++= Seq(
     "-deprecation",
     "-encoding",
@@ -17,7 +17,7 @@ lazy val commonSettings = Seq(
   ),
   libraryDependencies ++= Seq(
     // test
-    "org.mockito" % "mockito-core" % "2.15.0" % "test",
+    "org.mockito" % "mockito-core" % "2.18.3" % "test",
     "org.scalatest" %% "scalatest" % "3.0.5" % "test"
   ),
   wartremoverWarnings ++= Warts.allBut(
@@ -31,7 +31,7 @@ lazy val shared = crossProject.crossType(CrossType.Pure).in(file("shared")).sett
 lazy val sharedJvm = shared.jvm
 lazy val sharedJs = shared.js
 
-val Http4sVersion = "0.18.0"
+val Http4sVersion = "0.18.11"
 
 lazy val server = project
   .in(file("server"))
@@ -51,17 +51,22 @@ lazy val client = project
     commonSettings,
     scalaJSUseMainModuleInitializer := true,
     libraryDependencies ++= Seq(
-      "be.doeraene" %%% "scalajs-jquery" % "0.9.2",
+      "be.doeraene" %%% "scalajs-jquery" % "0.9.3",
       "com.lihaoyi" %%% "scalatags" % "0.6.7",
       "fr.hmil" %%% "roshttp" % "2.1.0",
-      "org.scala-js" %%% "scalajs-dom" % "0.9.4"
+      "org.scala-js" %%% "scalajs-dom" % "0.9.6"
     ),
     skip in packageJSDependencies := false,
-    jsDependencies += "org.webjars" % "jquery" % "3.2.1" / "3.2.1/jquery.js",
+    jsDependencies += "org.webjars" % "jquery" % "3.3.1" / "3.3.1/jquery.js",
     jsEnv := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv()
   )
   .enablePlugins(ScalaJSPlugin)
   .dependsOn(sharedJs)
+
+sharedJvm / scalafmtOnCompile := true
+sharedJs / scalafmtOnCompile := true
+server / scalafmtOnCompile := true
+client / scalafmtOnCompile := true
 
 commands += Command.command("checkCoverage") { state =>
   "coverage" :: "sharedJVM/clean" :: "sharedJVM/test" :: "coverageReport" :: state
