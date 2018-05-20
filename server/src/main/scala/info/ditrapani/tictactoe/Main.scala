@@ -1,15 +1,18 @@
 package info.ditrapani.tictactoe
 
 import cats.effect.{Effect, IO}
-import fs2.StreamApp
+import fs2.{Stream, StreamApp}
 import org.http4s.server.blaze.BlazeBuilder
 import scala.concurrent.ExecutionContext
+import StreamApp.ExitCode
 
 object Main extends StreamApp[IO] {
-  def stream(args: List[String], requestShutdown: IO[Unit]) = {
+  def stream(args: List[String], requestShutdown: IO[Unit]): Stream[IO, ExitCode] =
+    Stream.eval(ServerState.init()).flatMap(serverStream)
+
+  private def serverStream(serverState: ServerState): Stream[IO, ExitCode] =
     BlazeBuilder[IO]
       .bindHttp(8080, "0.0.0.0")
-      .mountService(new Server(ServerState.init()).service, "/")
+      .mountService(new Server(serverState).service, "/")
       .serve(Effect[IO], ExecutionContext.global)
-  }
 }

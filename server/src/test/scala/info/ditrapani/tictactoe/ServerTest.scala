@@ -68,7 +68,7 @@ class ServerTest extends Spec with KleisliSyntax with OptionValues {
       }
     }
 
-    "when any othec game state" in {
+    "when any other game state" in {
       val state = ServerState(1, 2, game.Player2Ready, Player1)
       val server = new Server(state)
       val service: HttpService[IO] = server.service
