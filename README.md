@@ -74,7 +74,6 @@ Status string: 12 characters with format PSSCCCCCCCCC where
 TODO
 ----
 
-- create graphviz dot state diagram
 - get root when Player2Ready
 - Write all server endpoint tests
 - Bad requests/forbidden should return 400 (bad request) 403 (forbidden)
