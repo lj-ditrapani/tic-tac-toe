@@ -1,18 +1,19 @@
 Tic-tac-toe 
 ===========
 
-tic-tac-toe client/server in scala using http4s & scala.js
+LAN multiplayer tic-tac-toe client/server in scala using http4s & scala.js
 
-![client.png](client.png)
+![doc/client.png](doc/client.png)
 
 Status
 ------
 
 WIP.  Server initial implementation.
+Server testing in progress.
 Basic client layout and gui.
 Client main loop missing.
 Shared code fully tested.
-No client or server tests yet.
+No client tests yet.
 
 Run it!
 -------
@@ -25,6 +26,8 @@ java -jar server/target/scala-2.12/server-assembly-x.x.x.jar
 ```
 
 Open `localhost:8080/` in browser.
+Then have your friend (assuming you have friends) open `<your ip>:8080/` in their browser.
+If you have no friends, open an incognito browser window to play against yourself.
 
 Notes
 -----
@@ -69,6 +72,8 @@ Status string: 12 characters with format PSSCCCCCCCCC where
     - E: Empty
     - X: player 1 has an X here
     - O: player 2 has an O here
+
+![doc/finite-state-machine.png](doc/finite-state-machine.png)
 
 
 TODO
