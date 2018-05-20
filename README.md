@@ -39,6 +39,8 @@ Game States
 - Player1Turn
 - Player2Turn
 - GameOver
+- Reset
+- Quit
 
 Endpoints:
 - GET /
@@ -53,6 +55,12 @@ Endpoints:
     - current player takes her turn; returns status string
 - POST /reset
     - when in GameOver state, either player can request a new game
+- POST /accept-reset
+    - when in reset state, accept to move to PlayerXTurn
+- POST /quit
+    - when in GameOver or Reset state, a player can quit
+- POST /acknowledge-quit
+    - when in Quit state, accept to move to PlayerXReady
 
 Status string: 12 characters with format PSSCCCCCCCCC where
 - P: Player
@@ -68,6 +76,10 @@ Status string: 12 characters with format PSSCCCCCCCCC where
     - G1: GameOver; player 1 wins
     - G2: GameOver; player 2 wins
     - GS: GameOver; it's a tie
+    - Q1: Quit player 1
+    - Q2: Quit player 2
+    - X1: Reset player 1
+    - X2: Reset player 2
 - C: Board Cell
     - E: Empty
     - X: player 1 has an X here
@@ -79,6 +91,11 @@ Status string: 12 characters with format PSSCCCCCCCCC where
 TODO
 ----
 
+- update shared models for reset & quit
+    - Also GameOver(End, board) to express tie (End is p1Win, p2Win or tie)
+    - Reset(Player)
+    - Quit(Player)
+    - maybe Ready(Player) and Turn(Player) instead of PlayerXReady, PlayerXTurn
 - get root when Player2Ready
 - Write all server endpoint tests
 - Bad requests/forbidden should return 400 (bad request) 403 (forbidden)
@@ -88,12 +105,12 @@ TODO
     - Player trying to POST play in wrong game state
     - POST reset when not game over
 - could add reset
-    - client: reset button appears on GameOver that POSTs to disconnect endpoint
-    - puts game in reset (1 or 2) state (waiting for other player to accept, or disconnect)
+    - client: reset button appears on GameOver that POSTs to reset endpoint
+    - puts game in reset (1 or 2) state (waiting for other player to accept, or quit)
     - after other player accepts, puts game in Player1Turn or Player2Turn state
-- could add disconnect
-    - server: a POST disconnect endpoint
-    - client: disconnect button appears in GameOver that POSTs to disconnect endpoint
-    - puts game in disconnected (1 or 2) state (waiting for remaining player to acknowledge)
+- could add quit
+    - server: a POST quit endpoint
+    - client: Quit button appears in GameOver that POSTs to quit endpoint
+    - puts game in Quit (1 or 2) state (waiting for remaining player to acknowledge)
     - When player acknowledges, puts game in Player1Ready or Player2Ready state;
       allowing another player to connect and play

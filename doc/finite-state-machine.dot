@@ -12,6 +12,7 @@ GameOver -> Reset[label="POST /reset"];
 GameOver -> Quit[label="POST /quit"];
 Reset -> Player1Turn[label="POST /accept-reset"];
 Reset -> Player2Turn[label="POST /accept-reset"];
+Reset -> Quit[label="POST /quit"];
 Quit -> Player1Ready[label="POST /acknowledge-quit"];
 Quit -> Player2Ready[label="POST /acknowledge-quit"];
 }
