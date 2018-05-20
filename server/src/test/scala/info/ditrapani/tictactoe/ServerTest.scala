@@ -57,48 +57,48 @@ class ServerTest extends AsyncSpec with KleisliSyntax with OptionValues {
           result.setCookie.value shouldBe "id=1"
           result.contentType shouldBe "text/html"
           result.body shouldBe Source.fromResource("index.html").mkString
-          result.gameState shouldBe game.Player1Ready
+          result.gameState shouldBe game.Ready(Player1)
         })
         .unsafeToFuture
     }
 
     "when game.Player1Ready" - {
       "and player's cookie id != player1 id; sets cookie to Player2 & advances state" in {
-        new Test(game.Player1Ready, Player1, Method.GET, Uri.uri("/"), None)
+        new Test(game.Ready(Player1), Player1, Method.GET, Uri.uri("/"), None)
           .run()
           .map(result => {
             result.statusCode shouldBe Status.Ok
             result.setCookie.value shouldBe "id=2"
             result.contentType shouldBe "text/html"
             result.body shouldBe Source.fromResource("index.html").mkString
-            result.gameState shouldBe game.Player1Turn(Board.init)
+            result.gameState shouldBe game.Turn(Player1, Board.init)
           })
           .unsafeToFuture
       }
 
       "and player's cookie id == player1 id; does not set cookie again or advance state" ignore {
-        new Test(game.Player1Ready, Player1, Method.GET, Uri.uri("/"), Some("1"))
+        new Test(game.Ready(Player1), Player1, Method.GET, Uri.uri("/"), Some("1"))
           .run()
           .map(result => {
             result.statusCode shouldBe Status.Ok
             result.setCookie shouldBe None
             result.contentType shouldBe "text/html"
             result.body shouldBe Source.fromResource("index.html").mkString
-            result.gameState shouldBe game.Player1Ready
+            result.gameState shouldBe game.Ready(Player1)
           })
           .unsafeToFuture
       }
     }
 
     "when any other game state" in {
-      new Test(game.Player1Turn(Board.init), Player1, Method.GET, Uri.uri("/"), Some("1"))
+      new Test(game.Turn(Player1, Board.init), Player1, Method.GET, Uri.uri("/"), Some("1"))
         .run()
         .map(result => {
           result.statusCode shouldBe Status.Ok
           result.setCookie shouldBe None
           result.contentType shouldBe "text/html"
           result.body shouldBe Source.fromResource("index.html").mkString
-          result.gameState shouldBe game.Player1Turn(Board.init)
+          result.gameState shouldBe game.Turn(Player1, Board.init)
         })
         .unsafeToFuture
     }

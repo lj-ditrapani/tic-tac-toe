@@ -8,31 +8,25 @@ sealed abstract class Game {
   def toString: String
   def toMessage(entity: Entity): String
 }
+
 object Init extends Game {
   def toResponse = "IN" + Game.emptyBoard
   override def toString = "game.Init"
   def toMessage(entity: Entity) = "No players have joined yet..."
 }
-object Player1Ready extends Game {
-  def toResponse = "R1" + Game.emptyBoard
-  override def toString = "game.Player1Ready"
-  def toMessage(entity: Entity) = Game.playerReadyMessage(entity, 1, 2)
+
+final case class Ready(player: Player) extends Game {
+  def toResponse = "R" + player.toResponse + Game.emptyBoard
+  override def toString = s"game.Ready ${player}"
+  def toMessage(entity: Entity) = Game.playerReadyMessage(entity, player.toInt, player.toggle.toInt)
 }
-object Player2Ready extends Game {
-  def toResponse = "R2" + Game.emptyBoard
-  override def toString = "game.Player2Ready"
-  def toMessage(entity: Entity) = Game.playerReadyMessage(entity, 2, 1)
+
+final case class Turn(player: Player, board: Board) extends Game {
+  def toResponse = "T" + player.toResponse + board.toResponse
+  override def toString = s"game.Turn $player $board"
+  def toMessage(entity: Entity) = Game.playerTurnMessage(entity, player, player.toInt)
 }
-final case class Player1Turn(board: Board) extends Game {
-  def toResponse = "T1" + board.toResponse
-  override def toString = s"game.Player1Turn $board"
-  def toMessage(entity: Entity) = Game.playerTurnMessage(entity, Player1, 1)
-}
-final case class Player2Turn(board: Board) extends Game {
-  def toResponse = "T2" + board.toResponse
-  override def toString = s"game.Player2Turn $board"
-  def toMessage(entity: Entity) = Game.playerTurnMessage(entity, Player2, 2)
-}
+
 final case class GameOver(winner: Player, board: Board) extends Game {
   def toResponse = "G" + winner.toResponse + board.toResponse
   override def toString = s"game.GameOver $winner $board"
@@ -55,10 +49,10 @@ object Game {
     require(status.length == 12)
     status.substring(1, 3) match {
       case "IN" => Init
-      case "R1" => Player1Ready
-      case "R2" => Player2Ready
-      case "T1" => Player1Turn(Board.fromStatusString(status))
-      case "T2" => Player2Turn(Board.fromStatusString(status))
+      case "R1" => Ready(Player1)
+      case "R2" => Ready(Player2)
+      case "T1" => Turn(Player1, Board.fromStatusString(status))
+      case "T2" => Turn(Player2, Board.fromStatusString(status))
       case "G1" => GameOver(Player1, Board.fromStatusString(status))
       case "G2" => GameOver(Player2, Board.fromStatusString(status))
       case _ => throw new IllegalArgumentException(s"Unknown game status in $status")

@@ -91,12 +91,13 @@ Status string: 12 characters with format PSSCCCCCCCCC where
 TODO
 ----
 
-- maybe Ready(Player) and Turn(Player) instead of PlayerXReady, PlayerXTurn
-- update shared models for reset & quit
-    - Also GameOver(End, board) to express tie (End is p1Win, p2Win or tie)
-    - Reset(Player)
-    - Quit(Player)
-    - maybe Ready(Player) and Turn(Player) instead of PlayerXReady, PlayerXTurn
+- Shared models
+    - GameOver(Ending, board) to express tie (Ending is p1Win, p2Win or tie)
+    - Test coverage Player
+    - Test coverage Game
+    - update shared models for reset & quit
+        - Reset(Player)
+        - Quit(Player)
 - get root when Player2Ready
 - Write all server endpoint tests
 - Bad requests/forbidden should return 400 (bad request) 403 (forbidden)

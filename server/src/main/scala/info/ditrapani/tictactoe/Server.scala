@@ -5,7 +5,7 @@ import fs2.async.Ref
 import org.http4s.{HttpService, Request, Response, StaticFile}
 import org.http4s.dsl.Http4sDsl
 import org.http4s.{Cookie, headers}
-import state.{Actor, Board, Entity, Player, Player1, Player2, Spectator}
+import state.{Actor, Board, Entity, Player, Player1, Spectator}
 import state.game
 import game.Game
 import state.cell
@@ -53,11 +53,11 @@ class Server(state: ServerState) extends Http4sDsl[IO] {
     gameState match {
       case game.Init =>
         gameStateRef
-          .setSync(game.Player1Ready)
+          .setSync(game.Ready(Player1))
           .map(_ => response.addCookie(Cookie("id", p1Id.toString)))
-      case game.Player1Ready =>
+      case game.Ready(Player1) =>
         gameStateRef
-          .setSync(game.Player1Turn(Board.init))
+          .setSync(game.Turn(Player1, Board.init))
           .map(_ => response.addCookie(Cookie("id", p2Id.toString)))
       case _ => IO.pure(response)
     }
@@ -74,8 +74,7 @@ class Server(state: ServerState) extends Http4sDsl[IO] {
             if (board.cells(index) == cell.Empty) {
               val newBoard = Board(board.cells.updated(index, player.token))
               val temp: Game = gameState match {
-                case game.Player1Turn(_) => game.Player2Turn(newBoard)
-                case game.Player2Turn(_) => game.Player1Turn(newBoard)
+                case game.Turn(player, _) => game.Turn(player.toggle, newBoard)
                 case _ => throw new RuntimeException("should be unreachable...")
               }
               gameStateRef.setSync(temp).flatMap(_ => Ok(statusString(entity, gameState)))
@@ -92,8 +91,7 @@ class Server(state: ServerState) extends Http4sDsl[IO] {
     gameState match {
       case game.GameOver(_, _) if entity != Spectator =>
         val temp: Game = entity match {
-          case Actor(Player1) => game.Player1Ready
-          case Actor(Player2) => game.Player2Ready
+          case Actor(player) => game.Ready(player)
           case Spectator =>
             throw new IllegalStateException("Guard clause should prevent Spectator case")
         }
@@ -122,8 +120,7 @@ class Server(state: ServerState) extends Http4sDsl[IO] {
 
   def getBoard(player: Player, gameState: Game): Option[Board] = {
     gameState match {
-      case game.Player1Turn(board) if player == Player1 => Some(board)
-      case game.Player2Turn(board) if player == Player2 => Some(board)
+      case game.Turn(turnPlayer, board) if player == turnPlayer => Some(board)
       case _ => None
     }
   }
