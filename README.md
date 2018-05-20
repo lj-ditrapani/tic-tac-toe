@@ -75,8 +75,6 @@ TODO
 ----
 
 - Write all server endpoint tests
-- Server needs rand effect injected
-- Server needs initial state injected
 - Bad requests/forbidden should return 400 (bad request) 403 (forbidden)
     - POST play with index out of bounds
     - POST play with index not empty cell
@@ -85,5 +83,5 @@ TODO
     - POST reset when not game over
 - Refactor server
 - serverState ServerState(game + firstPlayer)
-- Put serverState inside an fs2 signal to prevent concurrency bugs and enforce referential transparency.
+- Put serverState inside an fs2 async.Ref to prevent concurrency bugs and enforce referential transparency.
 - use tagless final to make server unit-testable (inject effect dependecies & parameterize effect type)
