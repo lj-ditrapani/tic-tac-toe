@@ -74,10 +74,10 @@ Status string: 12 characters with format PSSCCCCCCCCC where
     - G1: GameOver; player 1 wins
     - G2: GameOver; player 2 wins
     - GT: GameOver; it's a tie
-    - Q1: Quit player 1
-    - Q2: Quit player 2
     - X1: Reset player 1
     - X2: Reset player 2
+    - Q1: Quit player 1
+    - Q2: Quit player 2
 - C: Board Cell
     - E: Empty
     - X: player 1 has an X here
@@ -90,12 +90,10 @@ TODO
 ----
 
 - Shared models
-    - GameOver(Ending, board) to express tie (Ending is p1Win, p2Win or tie)
+    - add quitMessage, resetMessage, etc to Entity.
+      Refactor gameState.toMessage
     - Test coverage Player
     - Test coverage Game
-    - update shared models for reset & quit
-        - Reset(Player)
-        - Quit(Player)
 - get root when Ready(Player2)
 - Write all server endpoint tests
 - Bad requests/forbidden should return 400 (bad request) 403 (forbidden)
