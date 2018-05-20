@@ -34,10 +34,8 @@ Notes
 
 Game States
 - Init
-- Player1Ready
-- Player2Ready
-- Player1Turn
-- Player2Turn
+- Ready
+- Turn
 - GameOver
 - Reset
 - Quit
@@ -56,7 +54,7 @@ Endpoints:
 - POST /reset
     - when in GameOver state, either player can request a new game
 - POST /accept-reset
-    - when in reset state, accept to move to PlayerXTurn
+    - when in reset state, accept to move to Turn
 - POST /quit
     - when in GameOver or Reset state, a player can quit
 - POST /acknowledge-quit
@@ -69,13 +67,13 @@ Status string: 12 characters with format PSSCCCCCCCCC where
     - S: Spectator
 - SS: Game state
     - IN: Init
-    - R1: Player1Ready
-    - R2: Player2Ready
-    - T1: Player1Turn
-    - T2: Player2Turn
+    - R1: Ready player 1
+    - R2: Ready player 2
+    - T1: Turn player 1
+    - T2: Turn player 2
     - G1: GameOver; player 1 wins
     - G2: GameOver; player 2 wins
-    - GS: GameOver; it's a tie
+    - GT: GameOver; it's a tie
     - Q1: Quit player 1
     - Q2: Quit player 2
     - X1: Reset player 1

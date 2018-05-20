@@ -1,18 +1,11 @@
 digraph {
-Init -> Player1Ready[label="P1 GET /"];
-Player1Ready -> Player1Turn[label="P2 GET /"];
-Player1Ready -> Player2Turn[label="P2 GET /"];
-Player2Ready -> Player1Turn[label="P1 GET /"];
-Player2Ready -> Player2Turn[label="P1 GET /"];
-Player1Turn -> Player2Turn[label="P1 POST /play", color="blue"];
-Player2Turn -> Player1Turn[label="P2 POST /play", color="blue"];
-Player1Turn -> GameOver[label="P1 winning move", color="red"];
-Player2Turn -> GameOver[label="P2 winning move", color="red"];
+Init -> Ready[label="P1 GET /"];
+Ready -> Turn[label="GET /"];
+Turn -> Turn[label="POST /play", color="blue"];
+Turn -> GameOver[label="winning move", color="red"];
 GameOver -> Reset[label="POST /reset"];
 GameOver -> Quit[label="POST /quit"];
-Reset -> Player1Turn[label="POST /accept-reset"];
-Reset -> Player2Turn[label="POST /accept-reset"];
+Reset -> Turn[label="POST /accept-reset"];
 Reset -> Quit[label="POST /quit"];
-Quit -> Player1Ready[label="POST /acknowledge-quit"];
-Quit -> Player2Ready[label="POST /acknowledge-quit"];
+Quit -> Ready[label="POST /acknowledge-quit"];
 }
