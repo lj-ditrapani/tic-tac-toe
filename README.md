@@ -27,7 +27,7 @@ java -jar server/target/scala-2.12/server-assembly-x.x.x.jar
 
 Open `localhost:8080/` in browser.
 Then have your friend (assuming you have friends) open `<your ip>:8080/` in their browser.
-If you have no friends, open an incognito browser window to play against yourself.
+If you have no friends, open a private/incognito browser window to play against yourself.
 
 Notes
 -----
@@ -58,7 +58,7 @@ Endpoints:
 - POST /quit
     - when in GameOver or Reset state, a player can quit
 - POST /acknowledge-quit
-    - when in Quit state, accept to move to PlayerXReady
+    - when in Quit state, accept to move to Ready
 
 Status string: 12 characters with format PSSCCCCCCCCC where
 - P: Player
@@ -96,7 +96,7 @@ TODO
     - update shared models for reset & quit
         - Reset(Player)
         - Quit(Player)
-- get root when Player2Ready
+- get root when Ready(Player2)
 - Write all server endpoint tests
 - Bad requests/forbidden should return 400 (bad request) 403 (forbidden)
     - POST play with index out of bounds
@@ -107,10 +107,10 @@ TODO
 - could add reset
     - client: reset button appears on GameOver that POSTs to reset endpoint
     - puts game in reset (1 or 2) state (waiting for other player to accept, or quit)
-    - after other player accepts, puts game in Player1Turn or Player2Turn state
+    - after other player accepts, puts game in Turn state
 - could add quit
     - server: a POST quit endpoint
     - client: Quit button appears in GameOver that POSTs to quit endpoint
     - puts game in Quit (1 or 2) state (waiting for remaining player to acknowledge)
-    - When player acknowledges, puts game in Player1Ready or Player2Ready state;
+    - When player acknowledges, puts game in Ready state;
       allowing another player to connect and play
