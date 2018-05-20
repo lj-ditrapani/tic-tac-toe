@@ -74,7 +74,8 @@ Status string: 12 characters with format PSSCCCCCCCCC where
 TODO
 ----
 
-- Refactor server tests to not use usafeRunSync; chain IO instead
+- create graphviz dot state diagram
+- get root when Player2Ready
 - Write all server endpoint tests
 - Bad requests/forbidden should return 400 (bad request) 403 (forbidden)
     - POST play with index out of bounds
@@ -82,13 +83,13 @@ TODO
     - Player1 trying to POST play on Player2's turn
     - Player trying to POST play in wrong game state
     - POST reset when not game over
-- Refactor server
-- use tagless final to make server unit-testable (inject effect dependecies & parameterize effect type)
 - could add reset
     - client: reset button appears on GameOver that POSTs to disconnect endpoint
-    - puts game in reset state (waiting for other player to accept, or disconnect)
+    - puts game in reset (1 or 2) state (waiting for other player to accept, or disconnect)
     - after other player accepts, puts game in Player1Turn or Player2Turn state
 - could add disconnect
     - server: a POST disconnect endpoint
-    - client: disconnect button that POSTs to disconnect endpoint
-    - puts game in Player1Ready or Player2Ready state; allowing another player to connect and play
+    - client: disconnect button appears in GameOver that POSTs to disconnect endpoint
+    - puts game in disconnected (1 or 2) state (waiting for remaining player to acknowledge)
+    - When player acknowledges, puts game in Player1Ready or Player2Ready state;
+      allowing another player to connect and play

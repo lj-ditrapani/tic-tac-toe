@@ -1,7 +1,7 @@
 package info.ditrapani.tictactoe
 
-import org.scalatest.{AsyncFunSpec, FreeSpec, Matchers}
+import org.scalatest.{AsyncFreeSpec, FreeSpec, Matchers}
 
 abstract class Spec extends FreeSpec with Matchers
 
-abstract class AsyncSpec extends AsyncFunSpec with Matchers
+abstract class AsyncSpec extends AsyncFreeSpec with Matchers
