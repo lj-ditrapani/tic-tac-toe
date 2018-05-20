@@ -84,7 +84,11 @@ TODO
     - POST reset when not game over
 - Refactor server
 - use tagless final to make server unit-testable (inject effect dependecies & parameterize effect type)
-- could add
+- could add reset
+    - client: reset button appears on GameOver that POSTs to disconnect endpoint
+    - puts game in reset state (waiting for other player to accept, or disconnect)
+    - after other player accepts, puts game in Player1Turn or Player2Turn state
+- could add disconnect
     - server: a POST disconnect endpoint
     - client: disconnect button that POSTs to disconnect endpoint
     - puts game in Player1Ready or Player2Ready state; allowing another player to connect and play

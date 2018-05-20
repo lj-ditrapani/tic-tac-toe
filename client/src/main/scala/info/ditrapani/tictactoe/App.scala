@@ -1,17 +1,21 @@
 package info.ditrapani.tictactoe
 
+import org.scalajs.dom.document
 import org.scalajs.jquery.jQuery
 import fr.hmil.roshttp.HttpRequest
 import state.game.Game
 import state.Entity
 
 object App {
+  val host = document.location.host.split(":")(0)
+  val port = document.location.host.split(":")(1).toInt
+
   def main(args: Array[String]): Unit = {
     jQuery(() => setupUI())
     import monix.execution.Scheduler.Implicits.global
     HttpRequest()
-      .withHost("localhost")
-      .withPort(8080)
+      .withHost(host)
+      .withPort(port)
       .withPath("/status")
       .send()
       .map(r => {

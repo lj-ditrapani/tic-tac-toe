@@ -22,6 +22,33 @@ class Server(state: ServerState) extends Http4sDsl[IO] {
   def static(file: String, request: Request[IO]): IO[Response[IO]] =
     StaticFile.fromResource("/" + file, Some(request)).getOrElseF(NotFound())
 
+  val service: HttpService[IO] = HttpService[IO] {
+    case request @ GET -> Root =>
+      for {
+        gameState <- gameStateRef.get
+        responseWithFile <- static("index.html", request)
+        fullResponse <- handleRoot(gameState, responseWithFile)
+      } yield fullResponse
+    case request @ GET -> Root / "js" / file =>
+      static(s"js/$file", request)
+    case request @ GET -> Root / "img" / file =>
+      static(s"img/$file", request)
+    case request @ GET -> Root / "status" =>
+      gameStateRef.get.flatMap(gameState => Ok(statusString(getEntity(request), gameState)))
+    case request @ POST -> Root / "play" / IntVar(index) =>
+      val entity = getEntity(request)
+      for {
+        gameState <- gameStateRef.get
+        response <- handlePostPlay(index: Int, entity: Entity, gameState: Game)
+      } yield response
+    case request @ POST -> Root / "reset" =>
+      val entity = getEntity(request)
+      for {
+        gameState <- gameStateRef.get
+        response <- handlePostReset(entity: Entity, gameState: Game)
+      } yield response
+  }
+
   private def handleRoot(gameState: Game, response: Response[IO]): IO[Response[IO]] =
     gameState match {
       case game.Init =>
@@ -77,33 +104,6 @@ class Server(state: ServerState) extends Http4sDsl[IO] {
         } yield response
       case _ => Ok(statusString(entity, gameState))
     }
-
-  val service: HttpService[IO] = HttpService[IO] {
-    case request @ GET -> Root =>
-      for {
-        gameState <- gameStateRef.get
-        responseWithFile <- static("index.html", request)
-        fullResponse <- handleRoot(gameState, responseWithFile)
-      } yield fullResponse
-    case request @ GET -> Root / "js" / file =>
-      static(s"js/$file", request)
-    case request @ GET -> Root / "img" / file =>
-      static(s"img/$file", request)
-    case request @ GET -> Root / "status" =>
-      gameStateRef.get.flatMap(gameState => Ok(statusString(getEntity(request), gameState)))
-    case request @ POST -> Root / "play" / IntVar(index) =>
-      val entity = getEntity(request)
-      for {
-        gameState <- gameStateRef.get
-        response <- handlePostPlay(index: Int, entity: Entity, gameState: Game)
-      } yield response
-    case request @ POST -> Root / "reset" =>
-      val entity = getEntity(request)
-      for {
-        gameState <- gameStateRef.get
-        response <- handlePostReset(entity: Entity, gameState: Game)
-      } yield response
-  }
 
   def statusString(entity: Entity, gameState: Game): String =
     entity.toResponse + gameState.toResponse
