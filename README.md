@@ -74,6 +74,7 @@ Status string: 12 characters with format PSSCCCCCCCCC where
 TODO
 ----
 
+- Refactor server tests to not use usafeRunSync; chain IO instead
 - Write all server endpoint tests
 - Bad requests/forbidden should return 400 (bad request) 403 (forbidden)
     - POST play with index out of bounds
@@ -82,6 +83,8 @@ TODO
     - Player trying to POST play in wrong game state
     - POST reset when not game over
 - Refactor server
-- serverState ServerState(game + firstPlayer)
-- Put serverState inside an fs2 async.Ref to prevent concurrency bugs and enforce referential transparency.
 - use tagless final to make server unit-testable (inject effect dependecies & parameterize effect type)
+- could add
+    - server: a POST disconnect endpoint
+    - client: disconnect button that POSTs to disconnect endpoint
+    - puts game in Player1Ready or Player2Ready state; allowing another player to connect and play
