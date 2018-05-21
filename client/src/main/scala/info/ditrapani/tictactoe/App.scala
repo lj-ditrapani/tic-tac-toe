@@ -2,12 +2,18 @@ package info.ditrapani.tictactoe
 
 import org.scalajs.dom.document
 import org.scalajs.jquery.jQuery
-import fr.hmil.roshttp.HttpRequest
-import fr.hmil.roshttp.response.SimpleHttpResponse
+import fr.hmil.roshttp
+import monix.execution.Scheduler.Implicits.global
+import roshttp.HttpRequest
+import roshttp.Method.POST
+import roshttp.response.SimpleHttpResponse
 import scala.scalajs.js.timers
+import state.Board
+import state.cell
+import cell.Cell
 import state.game
 import game.Game
-import state.{Entity, Spectator}
+import state.{Actor, Entity, Spectator}
 
 object App {
   val host: String = document.location.host.split(":")(0)
@@ -27,8 +33,21 @@ object App {
     (): Unit
   }
 
-  def click(id: String)(): Unit = {
-    jQuery(s"#$id").attr("src", "img/ex.png")
+  def click(index: Int): Unit = {
+    (entity, gameState) match {
+      case (Actor(self), game.Turn(turnPlayer, _)) if self == turnPlayer => postPlay(index)
+      case _ => (): Unit
+    }
+  }
+
+  def postPlay(index: Int): Unit = {
+    HttpRequest()
+      .withHost(host)
+      .withPort(port)
+      .withPath(s"/play/$index")
+      .withMethod(POST)
+      .send()
+      .map(updateStatusWith)
     (): Unit
   }
 
@@ -50,7 +69,7 @@ object App {
                   val boxId = s"box$index"
                   val imgId = s"img$index"
                   val clickAttr = onclick := { () =>
-                    click(imgId)()
+                    click(index - 1)
                   }
                   val image = img(id := imgId, src := bgImg)
                   div(id := boxId, Styles.availableBox, clickAttr)(image)
@@ -65,7 +84,6 @@ object App {
 
   @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
   def statusUpdateLoop(): Unit = {
-    import monix.execution.Scheduler.Implicits.global
     HttpRequest()
       .withHost(host)
       .withPort(port)
@@ -74,7 +92,7 @@ object App {
       .map(updateStatusWith)
       .map(
         _ =>
-          timers.setTimeout(1000) {
+          timers.setTimeout(500) {
             statusUpdateLoop()
         }
       )
@@ -88,7 +106,19 @@ object App {
     gameState = Game.fromStatusString(status)
     jQuery("#entity").text(s"You are $entity")
     jQuery("#message").text(s"${gameState.toMessage(entity)}")
+    renderBoard(gameState.board)
     println(s"$entity  $gameState")
+  }
+
+  def renderBoard(board: Board): Unit = {
+    def getImage(c: Cell): String = c match {
+      case cell.X => "img/ex.png"
+      case cell.O => "img/oh.png"
+      case cell.Empty => "img/bg.png"
+    }
+    for ((c, index) <- board.cells.zipWithIndex) {
+      jQuery(s"#img${index + 1}").attr("src", getImage(c))
+    }
   }
 }
 

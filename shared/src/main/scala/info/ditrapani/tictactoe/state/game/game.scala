@@ -7,18 +7,21 @@ sealed abstract class Game {
   def toResponse: String
   def toString: String
   def toMessage(entity: Entity): String
+  def board(): Board
 }
 
 object Init extends Game {
   def toResponse = "IN" + Game.emptyBoard
   override def toString = "game.Init"
   def toMessage(entity: Entity) = "No players have joined yet..."
+  val board: Board = Board.init
 }
 
 final case class Ready(player: Player) extends Game {
   def toResponse = "R" + player.toResponse + Game.emptyBoard
   override def toString = s"game.Ready ${player}"
   def toMessage(entity: Entity) = entity.readyMessage(player)
+  val board: Board = Board.init
 }
 
 final case class Turn(player: Player, board: Board) extends Game {
