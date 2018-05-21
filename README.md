@@ -89,6 +89,17 @@ Status string: 12 characters with format PSSCCCCCCCCC where
 TODO
 ----
 
+- Basic functionality for server; do happy path for
+    - Enpoits:
+        - GET /
+        - GET /status
+        - POST /play
+    - States
+        - Init
+        - Ready
+        - Turn
+- Basic functionality for client
+
 - get root when Ready(Player2)
 - Write all server endpoint tests
 - Bad requests/forbidden should return 400 (bad request) 403 (forbidden)
@@ -97,13 +108,5 @@ TODO
     - Player1 trying to POST play on Player2's turn
     - Player trying to POST play in wrong game state
     - POST reset when not game over
-- could add reset
-    - client: reset button appears on GameOver that POSTs to reset endpoint
-    - puts game in reset (1 or 2) state (waiting for other player to accept, or quit)
-    - after other player accepts, puts game in Turn state
-- could add quit
-    - server: a POST quit endpoint
-    - client: Quit button appears in GameOver that POSTs to quit endpoint
-    - puts game in Quit (1 or 2) state (waiting for remaining player to acknowledge)
-    - When player acknowledges, puts game in Ready state;
-      allowing another player to connect and play
+- wrap IDs in Ref; reset corresponding id whenever a player quits
+    - ensures ids are secret
