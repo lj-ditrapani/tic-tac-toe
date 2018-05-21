@@ -9,6 +9,7 @@ sealed abstract class Player {
   def token: Cell
   def toggle: Player
 }
+
 object Player1 extends Player {
   override def toString = "Player 1"
   def toInt = 1
@@ -16,6 +17,7 @@ object Player1 extends Player {
   def token = cell.X
   def toggle = Player2
 }
+
 object Player2 extends Player {
   override def toString = "Player 2"
   def toInt = 2
@@ -23,6 +25,7 @@ object Player2 extends Player {
   def token = cell.O
   def toggle = Player1
 }
+
 object Player {
   @SuppressWarnings(Array("org.wartremover.warts.Throw"))
   def fromStatusString(status: String): Player =

@@ -1,7 +1,7 @@
 package info.ditrapani.tictactoe.state.game
 
 import info.ditrapani.tictactoe.state
-import state.{Board, Entity, Actor, Player, Player1, Player2, Spectator}
+import state.{Board, Entity, Player, Player1, Player2}
 
 sealed abstract class Game {
   def toResponse: String
@@ -18,58 +18,31 @@ object Init extends Game {
 final case class Ready(player: Player) extends Game {
   def toResponse = "R" + player.toResponse + Game.emptyBoard
   override def toString = s"game.Ready ${player}"
-  def toMessage(entity: Entity) = Game.readyMessage(entity, player.toInt, player.toggle.toInt)
+  def toMessage(entity: Entity) = entity.readyMessage(player)
 }
 
 final case class Turn(player: Player, board: Board) extends Game {
   def toResponse = "T" + player.toResponse + board.toResponse
   override def toString = s"game.Turn $player $board"
-  def toMessage(entity: Entity) = Game.turnMessage(entity, player, player.toInt)
+  def toMessage(entity: Entity) = entity.turnMessage(player)
 }
 
 final case class GameOver(ending: Ending, board: Board) extends Game {
   def toResponse = "G" + ending.toResponse + board.toResponse
   override def toString = s"game.GameOver $ending $board"
-  def toMessage(entity: Entity) =
-    entity match {
-      case Spectator => ending.toString
-      case Actor(player) =>
-        (ending -> player) match {
-          case (Tie, _) => Tie.toString()
-          case (P1Wins, Player1) | (P2Wins, Player2) => "You win!"
-          case _ => "You loose :("
-        }
-    }
+  def toMessage(entity: Entity) = entity.gameOverMessage(ending)
 }
 
 final case class Reset(player: Player, board: Board) extends Game {
   def toResponse = "X" + player.toResponse + board.toResponse
   override def toString = s"game.Reset $player $board"
-  def toMessage(entity: Entity) =
-    entity match {
-      case Spectator => s"$player wants a rematch"
-      case Actor(self) =>
-        if (self == player) {
-          s"Waiting for ${player.toggle} to accept the rematch."
-        } else {
-          s"$player wants a rematch.  Do you accept?"
-        }
-    }
+  def toMessage(entity: Entity) = entity.resetMessage(player)
 }
 
 final case class Quit(player: Player, board: Board) extends Game {
   def toResponse = "Q" + player.toResponse + board.toResponse
   override def toString = s"game.Quit $player $board"
-  def toMessage(entity: Entity) =
-    entity match {
-      case Spectator => s"$player quit"
-      case Actor(self) =>
-        if (self == player) {
-          "You quit...quitter"
-        } else {
-          s"$player quit.  Acknowlege by pressing the Acknowlege Quit button."
-        }
-    }
+  def toMessage(entity: Entity) = entity.quitMessage(player)
 }
 
 object Game {
@@ -94,18 +67,4 @@ object Game {
       case _ => throw new IllegalArgumentException(s"Unknown game status in $status")
     }
   }
-
-  def readyMessage(entity: Entity, ready: Int, waiting: Int): String =
-    entity match {
-      case Spectator => s"Player $ready has joined.  " + waitingMessage(waiting)
-      case _ => waitingMessage(waiting)
-    }
-
-  def turnMessage(entity: Entity, turnPlayer: Player, turn: Int): String =
-    entity.toPlayer.map(_ == turnPlayer).getOrElse(false) match {
-      case true => "Your turn"
-      case false => s"Player $turn's turn"
-    }
-
-  private def waitingMessage(waiting: Int): String = s"Waiting for Player $waiting to join"
 }
