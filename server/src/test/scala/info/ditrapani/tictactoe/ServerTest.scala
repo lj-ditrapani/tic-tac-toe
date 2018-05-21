@@ -48,7 +48,7 @@ class Test(gameState: Game, player: Player, method: Method, path: Uri, id: Optio
 
 @SuppressWarnings(Array("org.wartremover.warts.Throw"))
 class ServerTest extends AsyncSpec with KleisliSyntax with OptionValues {
-  "get index" - {
+  "GET /" - {
     "when game.Init" in {
       new Test(game.Init, Player1, Method.GET, Uri.uri("/"), None)
         .run()
@@ -103,4 +103,8 @@ class ServerTest extends AsyncSpec with KleisliSyntax with OptionValues {
         .unsafeToFuture
     }
   }
+
+  "GET /status" - {}
+
+  "POST /play" - {}
 }

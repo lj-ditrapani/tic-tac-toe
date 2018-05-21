@@ -26,8 +26,9 @@ class Server(state: ServerState) extends Http4sDsl[IO] {
     case request @ GET -> Root =>
       for {
         gameState <- gameStateRef.get
+        firstPlayer <- firstPlayerRef.get
         responseWithFile <- static("index.html", request)
-        fullResponse <- handleRoot(gameState, responseWithFile)
+        fullResponse <- handleRoot(gameState, firstPlayer, responseWithFile)
       } yield fullResponse
     case request @ GET -> Root / "js" / file =>
       static(s"js/$file", request)
@@ -47,18 +48,33 @@ class Server(state: ServerState) extends Http4sDsl[IO] {
         gameState <- gameStateRef.get
         response <- handlePostReset(entity: Entity, gameState: Game)
       } yield response
+    case POST -> Root / "accept-reset" =>
+      Ok("not implemented yet")
+    case POST -> Root / "quit" =>
+      // if GameOver: puts game in Quit (1 or 2) state (waiting for remaining player to acknowledge)
+      // if Ready: puts game in Init state
+      Ok("not implemented yet")
+    case POST -> Root / "acknowledge-quit" =>
+      Ok("not implemented yet")
   }
 
-  private def handleRoot(gameState: Game, response: Response[IO]): IO[Response[IO]] =
+  private def handleRoot(
+      gameState: Game,
+      firstPlayer: Player,
+      response: Response[IO]
+  ): IO[Response[IO]] =
     gameState match {
       case game.Init =>
         gameStateRef
           .setSync(game.Ready(Player1))
           .map(_ => response.addCookie(Cookie("id", p1Id.toString)))
-      case game.Ready(Player1) =>
+      case game.Ready(player) =>
+        val id = if (player == Player1) { p2Id } else { p1Id }
+        // get Option[Cookie ID] from Request Header
+        // if present and valid; don't set it again
         gameStateRef
-          .setSync(game.Turn(Player1, Board.init))
-          .map(_ => response.addCookie(Cookie("id", p2Id.toString)))
+          .setSync(game.Turn(firstPlayer, Board.init))
+          .map(_ => response.addCookie(Cookie("id", id.toString)))
       case _ => IO.pure(response)
     }
 
