@@ -3,30 +3,27 @@ package info.ditrapani.tictactoe
 import org.scalajs.dom.document
 import org.scalajs.jquery.jQuery
 import fr.hmil.roshttp.HttpRequest
-import state.game.Game
-import state.Entity
+import fr.hmil.roshttp.response.SimpleHttpResponse
+import scala.scalajs.js.timers
+import state.game
+import game.Game
+import state.{Entity, Spectator}
 
 object App {
   val host: String = document.location.host.split(":")(0)
   val port: Int = document.location.host.split(":")(1).toInt
+  @SuppressWarnings(Array("org.wartremover.warts.Var"))
+  var entity: Entity = Spectator
+  @SuppressWarnings(Array("org.wartremover.warts.Var"))
+  var gameState: Game = game.Init
 
   def main(args: Array[String]): Unit = {
+    println("before ui setup")
     jQuery(() => setupUI())
-    import monix.execution.Scheduler.Implicits.global
-    HttpRequest()
-      .withHost(host)
-      .withPort(port)
-      .withPath("/status")
-      .send()
-      .map(r => {
-        val status = r.body
-        println(status)
-        val entity = Entity.fromStatusString(status)
-        val game = Game.fromStatusString(status)
-        jQuery("#entity").text(s"You are $entity")
-        jQuery("#message").text(s"${game.toMessage(entity)}")
-        println(s"$entity  $game")
-      })
+    println("after ui setup")
+    println("before update loop")
+    statusUpdateLoop()
+    println("after update loop")
     (): Unit
   }
 
@@ -64,6 +61,34 @@ object App {
     jQuery("head").append(s"<style>${Styles.styleSheetText}</style>")
     jQuery("body").append(d.render)
     (): Unit
+  }
+
+  @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
+  def statusUpdateLoop(): Unit = {
+    import monix.execution.Scheduler.Implicits.global
+    HttpRequest()
+      .withHost(host)
+      .withPort(port)
+      .withPath("/status")
+      .send()
+      .map(updateStatusWith)
+      .map(
+        _ =>
+          timers.setTimeout(1000) {
+            statusUpdateLoop()
+        }
+      )
+    (): Unit
+  }
+
+  def updateStatusWith(response: SimpleHttpResponse): Unit = {
+    val status = response.body
+    println(status)
+    entity = Entity.fromStatusString(status)
+    gameState = Game.fromStatusString(status)
+    jQuery("#entity").text(s"You are $entity")
+    jQuery("#message").text(s"${gameState.toMessage(entity)}")
+    println(s"$entity  $gameState")
   }
 }
 
