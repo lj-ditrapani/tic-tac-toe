@@ -9,7 +9,7 @@ class EndingTest extends Spec {
     }
 
     "toMessage returns the game message" in {
-      P1Wins.toMessage() shouldBe "Player 1 won!"
+      P1Wins.toMessage() shouldBe "Player 1 wins!"
     }
 
     "toString returns a string representation" in {
@@ -23,7 +23,7 @@ class EndingTest extends Spec {
     }
 
     "toMessage returns the game message" in {
-      P2Wins.toMessage() shouldBe "Player 2 won!"
+      P2Wins.toMessage() shouldBe "Player 2 wins!"
     }
 
     "toString returns a string representation" in {
@@ -37,7 +37,7 @@ class EndingTest extends Spec {
     }
 
     "toMessage returns the game message" in {
-      Tie.toMessage() shouldBe "It was a tie!"
+      Tie.toMessage() shouldBe "It's a tie!"
     }
 
     "toString returns a string representation" in {

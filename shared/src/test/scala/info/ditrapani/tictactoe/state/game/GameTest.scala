@@ -57,12 +57,12 @@ class GameTest extends Spec {
   "toMessage" - {
     val tests = List(
       (Init, Actor.player1, "No players have joined yet..."),
-      (Ready(Player1), Actor.player1, "Waiting for Player 2 to join"),
-      (Ready(Player1), Spectator, "Player 1 has joined.  Waiting for Player 2 to join"),
-      (Ready(Player2), Actor.player1, "Waiting for Player 1 to join"),
+      (Ready(Player1), Actor.player1, "Waiting for Player 2 to join."),
+      (Ready(Player1), Spectator, "Player 1 has joined.  Waiting for Player 2 to join."),
+      (Ready(Player2), Actor.player1, "Waiting for Player 1 to join."),
       (Turn(Player1, Board.fromStatusString(boardT1)), Actor.player1, "Your turn"),
       (Turn(Player2, Board.fromStatusString(boardT2)), Actor.player1, "Player 2's turn"),
-      (GameOver(P1Wins, Board.fromStatusString(boardG1)), Spectator, "Player 1 won!"),
+      (GameOver(P1Wins, Board.fromStatusString(boardG1)), Spectator, "Player 1 wins!"),
       (GameOver(P1Wins, Board.fromStatusString(boardG1)), Actor.player1, "You win!"),
       (GameOver(P2Wins, Board.fromStatusString(boardG2)), Actor.player1, "You loose :(")
     )

@@ -90,8 +90,6 @@ TODO
 ----
 
 - Shared models
-    - Test coverage Player
-    - Test coverage Entity
     - Test coverage Game
 - get root when Ready(Player2)
 - Write all server endpoint tests

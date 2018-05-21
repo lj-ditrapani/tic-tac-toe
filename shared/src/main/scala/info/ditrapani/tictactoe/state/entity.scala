@@ -80,5 +80,5 @@ object Entity {
       case char => throw new IllegalArgumentException(s"Uknown entity char $char")
     }
 
-  def waitingMessage(player: Player): String = s"Waiting for $player to join"
+  def waitingMessage(player: Player): String = s"Waiting for $player to join."
 }
