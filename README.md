@@ -1,4 +1,4 @@
-Tic-tac-toe 
+Tic-tac-toe
 ===========
 
 LAN multiplayer tic-tac-toe client/server in scala using http4s & scala.js
@@ -54,11 +54,11 @@ Endpoints:
 - POST /reset
     - when in GameOver state, either player can request a new game
 - POST /accept-reset
-    - when in reset state, accept to move to Turn
+    - when in reset state; next state is Turn
 - POST /quit
-    - when in GameOver or Reset state, a player can quit
+    - when in GameOver, Reset, or Ready state, a player can quit
 - POST /acknowledge-quit
-    - when in Quit state, accept to move to Ready
+    - when in Quit state; next state is Ready
 
 Status string: 12 characters with format PSSCCCCCCCCC where
 - P: Player
