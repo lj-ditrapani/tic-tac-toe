@@ -24,12 +24,8 @@ object App {
   var gameState: Game = game.Init
 
   def main(args: Array[String]): Unit = {
-    println("before ui setup")
     jQuery(() => setupUI())
-    println("after ui setup")
-    println("before update loop")
     statusUpdateLoop()
-    println("after update loop")
     (): Unit
   }
 
@@ -101,13 +97,11 @@ object App {
 
   def updateStatusWith(response: SimpleHttpResponse): Unit = {
     val status = response.body
-    println(status)
     entity = Entity.fromStatusString(status)
     gameState = Game.fromStatusString(status)
     jQuery("#entity").text(s"You are $entity")
     jQuery("#message").text(s"${gameState.toMessage(entity)}")
     renderBoard(gameState.board)
-    println(s"$entity  $gameState")
   }
 
   def renderBoard(board: Board): Unit = {
