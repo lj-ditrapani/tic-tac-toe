@@ -89,11 +89,8 @@ class Server(state: ServerState) extends Http4sDsl[IO] {
           case Some(board) =>
             if (board.cells(index) == cell.Empty) {
               val newBoard = Board(board.cells.updated(index, player.token))
-              val temp: Game = gameState match {
-                case game.Turn(player, _) => game.Turn(player.toggle, newBoard)
-                case _ => throw new RuntimeException("should be unreachable...")
-              }
-              gameStateRef.setSync(temp).flatMap(_ => Ok(statusString(entity, gameState)))
+              val temp: Game = game.Turn(player.toggle, newBoard)
+              gameStateRef.setSync(temp).flatMap(_ => Ok(statusString(entity, temp)))
             } else {
               Ok(statusString(entity, gameState) + s" can't play there! $index")
             }

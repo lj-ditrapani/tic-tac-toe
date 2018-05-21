@@ -89,15 +89,6 @@ Status string: 12 characters with format PSSCCCCCCCCC where
 TODO
 ----
 
-- Basic functionality for server; do happy path for
-    - Enpoits:
-        - GET /
-        - GET /status
-        - POST /play
-    - States
-        - Init
-        - Ready
-        - Turn
 - Basic functionality for client
 
 - get root when Ready(Player2)

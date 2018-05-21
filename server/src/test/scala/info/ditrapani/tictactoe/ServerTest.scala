@@ -8,7 +8,7 @@ import org.http4s.util.CaseInsensitiveString
 import org.scalatest.OptionValues
 import state.game
 import game.Game
-import state.{Board, Player, Player1}
+import state.{Board, Player, Player1, Player2}
 import scala.io.Source
 
 final case class Result(
@@ -104,7 +104,51 @@ class ServerTest extends AsyncSpec with KleisliSyntax with OptionValues {
     }
   }
 
-  "GET /status" - {}
+  "GET /status" - {
+    "returns the current, plain-text, status string" in {
+      val board = Board.fromStatusString("---XEEEOEEEE")
+      new Test(game.Turn(Player2, board), Player2, Method.GET, Uri.uri("/status"), Some("2"))
+        .run()
+        .map(result => {
+          result.statusCode shouldBe Status.Ok
+          result.setCookie shouldBe None
+          result.contentType shouldBe "text/plain; charset=UTF-8"
+          result.body shouldBe "2T2XEEEOEEEE"
+          result.gameState shouldBe game.Turn(Player2, board)
+        })
+        .unsafeToFuture
+    }
+  }
 
-  "POST /play" - {}
+  "POST /play" - {
+    "when it is Player1's turn and player 1 moves, and the move is valid, updates the game state" in {
+      val board1 = Board.fromStatusString("---XEEEOEEEE")
+      val board2 = Board.fromStatusString("---XEXEOEEEE")
+      new Test(game.Turn(Player1, board1), Player1, Method.POST, Uri.uri("/play/2"), Some("1"))
+        .run()
+        .map(result => {
+          result.statusCode shouldBe Status.Ok
+          result.setCookie shouldBe None
+          result.contentType shouldBe "text/plain; charset=UTF-8"
+          result.body shouldBe "1T2XEXEOEEEE"
+          result.gameState shouldBe game.Turn(Player2, board2)
+        })
+        .unsafeToFuture
+    }
+
+    "when it is Player2's turn and player 2 moves, and the move is valid, updates the game state" in {
+      val board1 = Board.fromStatusString("---XEXEOEEEE")
+      val board2 = Board.fromStatusString("---XEXEOEEOE")
+      new Test(game.Turn(Player2, board1), Player2, Method.POST, Uri.uri("/play/7"), Some("2"))
+        .run()
+        .map(result => {
+          result.statusCode shouldBe Status.Ok
+          result.setCookie shouldBe None
+          result.contentType shouldBe "text/plain; charset=UTF-8"
+          result.body shouldBe "2T1XEXEOEEOE"
+          result.gameState shouldBe game.Turn(Player1, board2)
+        })
+        .unsafeToFuture
+    }
+  }
 }
