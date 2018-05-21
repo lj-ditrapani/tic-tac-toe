@@ -8,6 +8,10 @@ class PlayerTest extends Spec {
       Player1.toString shouldBe "Player 1"
     }
 
+    "toInt returns the player #" in {
+      Player1.toInt shouldBe 1
+    }
+
     "toResponse returns response string" in {
       Player1.toResponse shouldBe "1"
     }
@@ -24,6 +28,10 @@ class PlayerTest extends Spec {
   "Player2" - {
     "toString returns string representation" in {
       Player2.toString shouldBe "Player 2"
+    }
+
+    "toInt returns the player #" in {
+      Player2.toInt shouldBe 2
     }
 
     "toResponse returns response string" in {

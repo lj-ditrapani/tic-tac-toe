@@ -90,7 +90,6 @@ TODO
 ----
 
 - Shared models
-    - Test coverage game.Ending
     - Test coverage Player
     - Test coverage Entity
     - Test coverage Game

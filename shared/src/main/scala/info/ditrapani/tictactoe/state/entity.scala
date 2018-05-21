@@ -21,7 +21,7 @@ object Spectator extends Entity {
 
   def turnMessage(turnPlayer: Player) = s"$turnPlayer's turn"
 
-  def gameOverMessage(ending: Ending) = ending.toString
+  def gameOverMessage(ending: Ending) = ending.toMessage()
 
   def resetMessage(resetter: Player) = s"$resetter wants a rematch"
 
@@ -45,7 +45,7 @@ final case class Actor(player: Player) extends Entity {
 
   def gameOverMessage(ending: Ending) =
     (ending -> player) match {
-      case (Tie, _) => Tie.toString()
+      case (Tie, _) => Tie.toMessage()
       case (P1Wins, Player1) | (P2Wins, Player2) => "You win!"
       case _ => "You loose :("
     }
