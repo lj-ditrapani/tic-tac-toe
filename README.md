@@ -94,7 +94,6 @@ TODO
     - Test coverage Player
     - Test coverage Entity
     - Test coverage Game
-    - update server & client code
 - get root when Ready(Player2)
 - Write all server endpoint tests
 - Bad requests/forbidden should return 400 (bad request) 403 (forbidden)

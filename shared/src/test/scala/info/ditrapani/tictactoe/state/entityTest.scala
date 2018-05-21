@@ -11,10 +11,6 @@ class EntityTest extends Spec {
     "toResponse returns response entity string" in {
       Spectator.toResponse shouldBe "S"
     }
-
-    "toPlayer returns None" in {
-      Spectator.toPlayer shouldBe None
-    }
   }
 
   "Actor" - {
@@ -26,10 +22,6 @@ class EntityTest extends Spec {
       "toResponse returns response entity string" in {
         Actor.player1.toResponse shouldBe "1"
       }
-
-      "toPlayer returns Some(Player1)" in {
-        Actor.player1.toPlayer shouldBe Some(Player1)
-      }
     }
 
     "containing Player2" - {
@@ -39,10 +31,6 @@ class EntityTest extends Spec {
 
       "toResponse returns response entity string" in {
         Actor.player2.toResponse shouldBe "2"
-      }
-
-      "toPlayer returns Some(Player1)" in {
-        Actor.player2.toPlayer shouldBe Some(Player2)
       }
     }
   }
