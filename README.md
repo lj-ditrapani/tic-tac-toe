@@ -8,12 +8,8 @@ LAN multiplayer tic-tac-toe client/server in scala using http4s & scala.js
 Status
 ------
 
-WIP.  Server initial implementation.
-Server testing in progress.
-Basic client layout and gui.
-Client main loop missing.
+WIP.  Basic server & client happy path.
 Shared code fully tested.
-No client tests yet.
 
 Run it!
 -------
@@ -89,8 +85,8 @@ Status string: 12 characters with format PSSCCCCCCCCC where
 TODO
 ----
 
-- Basic functionality for client
-
+- better background tile
+- update screenshot
 - get root when Ready(Player2)
 - Write all server endpoint tests
 - Bad requests/forbidden should return 400 (bad request) 403 (forbidden)
@@ -101,3 +97,4 @@ TODO
     - POST reset when not game over
 - wrap IDs in Ref; reset corresponding id whenever a player quits
     - ensures ids are secret
+- Missing state handling: GameOver, Quit, Reset
