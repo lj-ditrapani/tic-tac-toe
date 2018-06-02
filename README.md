@@ -85,7 +85,6 @@ Status string: 12 characters with format PSSCCCCCCCCC where
 TODO
 ----
 
-- get root when Ready(Player2)
 - Write all server endpoint tests
 - Bad requests/forbidden should return 400 (bad request) 403 (forbidden)
     - POST play with index out of bounds
@@ -95,4 +94,4 @@ TODO
     - POST reset when not game over
 - wrap IDs in Ref; reset corresponding id whenever a player quits
     - ensures ids are secret
-- Missing state handling: GameOver, Quit, Reset
+- Missing state handling: Quit

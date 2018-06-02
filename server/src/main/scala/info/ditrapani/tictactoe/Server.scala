@@ -48,8 +48,12 @@ class Server(state: ServerState) extends Http4sDsl[IO] {
         gameState <- gameStateRef.get
         response <- handleReset(entity: Entity, gameState: Game)
       } yield response
-    case POST -> Root / "accept-reset" =>
-      Ok("not implemented yet")
+    case request @ POST -> Root / "accept-reset" =>
+      val entity = getEntity(request)
+      for {
+        gameState <- gameStateRef.get
+        response <- handleAcceptReset(entity: Entity, gameState: Game)
+      } yield response
     case POST -> Root / "quit" =>
       // if GameOver: puts game in Quit (1 or 2) state (waiting for remaining player to acknowledge)
       // if Ready: puts game in Init state
@@ -104,16 +108,22 @@ class Server(state: ServerState) extends Http4sDsl[IO] {
 
   @SuppressWarnings(Array("org.wartremover.warts.Throw"))
   private def handleReset(entity: Entity, gameState: Game): IO[Response[IO]] =
-    gameState match {
-      case game.GameOver(_, _) if entity != Spectator =>
-        val temp: Game = entity match {
-          case Actor(player) => game.Ready(player)
-          case Spectator =>
-            throw new IllegalStateException("Guard clause should prevent Spectator case")
-        }
+    (gameState -> entity) match {
+      case (game.GameOver(_, board), Actor(self)) =>
         for {
           _ <- firstPlayerRef.modify(_.toggle)
-          _ <- gameStateRef.setSync(temp)
+          _ <- gameStateRef.setSync(game.Reset(self, board))
+          response <- Ok(statusString(entity, gameState))
+        } yield response
+      case _ => Ok(statusString(entity, gameState))
+    }
+
+  private def handleAcceptReset(entity: Entity, gameState: Game): IO[Response[IO]] =
+    (gameState -> entity) match {
+      case (game.Reset(resetPlayer, _), Actor(self)) if resetPlayer != self =>
+        for {
+          firstPlayer <- firstPlayerRef.get
+          _ <- gameStateRef.setSync(game.Turn(firstPlayer, Board.init))
           response <- Ok(statusString(entity, gameState))
         } yield response
       case _ => Ok(statusString(entity, gameState))

@@ -18,6 +18,7 @@ import state.{Actor, Entity, Spectator}
 object App {
   val host: String = document.location.host.split(":")(0)
   val port: Int = document.location.host.split(":")(1).toInt
+  val baseRequest: HttpRequest = HttpRequest().withHost(host).withPort(port)
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   var entity: Entity = Spectator
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
@@ -37,10 +38,26 @@ object App {
   }
 
   def postPlay(index: Int): Unit = {
-    HttpRequest()
-      .withHost(host)
-      .withPort(port)
+    baseRequest
       .withPath(s"/play/$index")
+      .withMethod(POST)
+      .send()
+      .map(updateStatusWith)
+    (): Unit
+  }
+
+  def postReset(): Unit = {
+    baseRequest
+      .withPath("/reset")
+      .withMethod(POST)
+      .send()
+      .map(updateStatusWith)
+    (): Unit
+  }
+
+  def postAcceptReset(): Unit = {
+    baseRequest
+      .withPath("/accept-reset")
       .withMethod(POST)
       .send()
       .map(updateStatusWith)
@@ -71,6 +88,20 @@ object App {
                   div(id := boxId, Styles.box, Styles.availableBox, clickAttr)(image)
                 }
             )
+      ),
+      div(
+        button(id := "reset-button", disabled := true, onclick := { () =>
+          postReset()
+        })("Reset"),
+        button(id := "accept-reset-button", disabled := true, onclick := { () =>
+          postAcceptReset()
+        })("Accept Reset"),
+        button(id := "quit-button", disabled := true, onclick := { () =>
+          println("Quit")
+        })("Quit"),
+        button(id := "acknowledge-quit-button", disabled := true, onclick := { () =>
+          println("Acknowledge Quit")
+        })("Acknowledge Quit")
       )
     )
     jQuery("head").append(s"<style>${Styles.styleSheetText}</style>")
@@ -80,9 +111,7 @@ object App {
 
   @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
   def statusUpdateLoop(): Unit = {
-    HttpRequest()
-      .withHost(host)
-      .withPort(port)
+    baseRequest
       .withPath("/status")
       .send()
       .map(updateStatusWith)
@@ -102,16 +131,17 @@ object App {
     jQuery("#entity").text(s"You are $entity")
     jQuery("#message").text(s"${gameState.toMessage(entity)}")
     renderBoard(gameState.board)
-    gameState.board.getEnding() match {
-      case Some(game.EndingLines(_, lines)) =>
-        for (line <- lines) {
-          for (index <- line) {
-            jQuery(s"#box$index").addClass(Styles.winBox.name)
-          }
-        }
-      case None =>
-        (): Unit
+    (gameState -> entity) match {
+      case (game.GameOver(_, _), _) =>
+        enableButtons(true, false, true, false)
+      case (game.Reset(resetPlayer, _), Actor(self)) if resetPlayer != self =>
+        enableButtons(false, true, true, false)
+      case (game.Quit(quitPlayer, _), Actor(self)) if quitPlayer != self =>
+        enableButtons(false, false, false, true)
+      case _ =>
+        enableButtons(false, false, false, false)
     }
+    (): Unit
   }
 
   def renderBoard(board: Board): Unit = {
@@ -122,10 +152,32 @@ object App {
     }
     for ((c, index) <- board.cells.zipWithIndex) {
       jQuery(s"#img$index").attr("src", getImage(c))
+      jQuery(s"#box$index").removeClass(Styles.winBox.name)
       if (c != cell.Empty) {
         jQuery(s"#box$index").removeClass(Styles.availableBox.name)
+      } else {
+        jQuery(s"#box$index").addClass(Styles.availableBox.name)
       }
     }
+    val lines = board.getEnding().map(_.lines).getOrElse(List[List[Int]]())
+    for (line <- lines) {
+      for (index <- line) {
+        jQuery(s"#box$index").addClass(Styles.winBox.name)
+      }
+    }
+  }
+
+  def enableButtons(
+      reset: Boolean,
+      acceptReset: Boolean,
+      quit: Boolean,
+      acknowledgeQuit: Boolean
+  ): Unit = {
+    jQuery("#reset-button").attr("disabled", !reset)
+    jQuery("#accept-reset-button").attr("disabled", !acceptReset)
+    jQuery("#quit-button").attr("disabled", !quit)
+    jQuery("#acknowledge-quit-button").attr("disabled", !acknowledgeQuit)
+    (): Unit
   }
 }
 
