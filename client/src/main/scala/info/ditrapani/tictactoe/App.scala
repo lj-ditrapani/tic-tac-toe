@@ -30,7 +30,7 @@ object App {
   }
 
   def click(index: Int): Unit = {
-    (entity, gameState) match {
+    (entity -> gameState) match {
       case (Actor(self), game.Turn(turnPlayer, _)) if self == turnPlayer => postPlay(index)
       case _ => (): Unit
     }
@@ -56,19 +56,19 @@ object App {
       p(id := "entity")("Player Unknown"),
       p(id := "message")("Loading..."),
       div(Styles.frame)(
-        for (x <- 1.to(3))
+        for (x <- 0.to(2))
           yield
             div(Styles.row)(
-              for (y <- 1.to(3))
+              for (y <- 0.to(2))
                 yield {
-                  val index = (x - 1) * 3 + y
+                  val index = x * 3 + y
                   val boxId = s"box$index"
                   val imgId = s"img$index"
                   val clickAttr = onclick := { () =>
-                    click(index - 1)
+                    click(index)
                   }
                   val image = img(id := imgId, src := bgImg)
-                  div(id := boxId, Styles.availableBox, clickAttr)(image)
+                  div(id := boxId, Styles.box, Styles.availableBox, clickAttr)(image)
                 }
             )
       )
@@ -102,6 +102,16 @@ object App {
     jQuery("#entity").text(s"You are $entity")
     jQuery("#message").text(s"${gameState.toMessage(entity)}")
     renderBoard(gameState.board)
+    gameState.board.getEnding() match {
+      case Some(game.EndingLines(_, lines)) =>
+        for (line <- lines) {
+          for (index <- line) {
+            jQuery(s"#box$index").addClass(Styles.winBox.name)
+          }
+        }
+      case None =>
+        (): Unit
+    }
   }
 
   def renderBoard(board: Board): Unit = {
@@ -111,7 +121,10 @@ object App {
       case cell.Empty => "img/bg.png"
     }
     for ((c, index) <- board.cells.zipWithIndex) {
-      jQuery(s"#img${index + 1}").attr("src", getImage(c))
+      jQuery(s"#img$index").attr("src", getImage(c))
+      if (c != cell.Empty) {
+        jQuery(s"#box$index").removeClass(Styles.availableBox.name)
+      }
     }
   }
 }
@@ -124,7 +137,7 @@ object Styles extends StyleSheet {
   import scalatags.JsDom.implicits._
   initStyleSheet()
 
-  val unavailableBox = cls(
+  val box = cls(
     s.display := "inline-block",
     s.backgroundColor := "white",
     s.height := 128,
@@ -133,10 +146,13 @@ object Styles extends StyleSheet {
   )
 
   val availableBox = cls(
-    unavailableBox.splice,
     &.hover(
       s.borderColor := "red"
     )
+  )
+
+  val winBox = cls(
+    s.borderColor := "blue"
   )
 
   val row = cls(
