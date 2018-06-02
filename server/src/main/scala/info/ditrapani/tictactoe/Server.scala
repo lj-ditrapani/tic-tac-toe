@@ -40,13 +40,13 @@ class Server(state: ServerState) extends Http4sDsl[IO] {
       val entity = getEntity(request)
       for {
         gameState <- gameStateRef.get
-        response <- handlePostPlay(index: Int, entity: Entity, gameState: Game)
+        response <- handlePlay(index: Int, entity: Entity, gameState: Game)
       } yield response
     case request @ POST -> Root / "reset" =>
       val entity = getEntity(request)
       for {
         gameState <- gameStateRef.get
-        response <- handlePostReset(entity: Entity, gameState: Game)
+        response <- handleReset(entity: Entity, gameState: Game)
       } yield response
     case POST -> Root / "accept-reset" =>
       Ok("not implemented yet")
@@ -79,7 +79,7 @@ class Server(state: ServerState) extends Http4sDsl[IO] {
     }
 
   @SuppressWarnings(Array("org.wartremover.warts.Throw"))
-  private def handlePostPlay(index: Int, entity: Entity, gameState: Game): IO[Response[IO]] =
+  private def handlePlay(index: Int, entity: Entity, gameState: Game): IO[Response[IO]] =
     entity match {
       case Actor(player) =>
         getBoard(player, gameState) match {
@@ -89,7 +89,10 @@ class Server(state: ServerState) extends Http4sDsl[IO] {
           case Some(board) =>
             if (board.cells(index) == cell.Empty) {
               val newBoard = Board(board.cells.updated(index, player.token))
-              val temp: Game = game.Turn(player.toggle, newBoard)
+              val temp: Game = isGameOver(newBoard) match {
+                case None => game.Turn(player.toggle, newBoard)
+                case Some(ending) => game.GameOver(ending, newBoard)
+              }
               gameStateRef.setSync(temp).flatMap(_ => Ok(statusString(entity, temp)))
             } else {
               Ok(statusString(entity, gameState) + s" can't play there! $index")
@@ -100,7 +103,7 @@ class Server(state: ServerState) extends Http4sDsl[IO] {
     }
 
   @SuppressWarnings(Array("org.wartremover.warts.Throw"))
-  private def handlePostReset(entity: Entity, gameState: Game): IO[Response[IO]] =
+  private def handleReset(entity: Entity, gameState: Game): IO[Response[IO]] =
     gameState match {
       case game.GameOver(_, _) if entity != Spectator =>
         val temp: Game = entity match {
@@ -137,4 +140,6 @@ class Server(state: ServerState) extends Http4sDsl[IO] {
       case _ => None
     }
   }
+
+  def isGameOver(board: Board): Option[game.Ending] = board.getEnding.map(_.ending)
 }
