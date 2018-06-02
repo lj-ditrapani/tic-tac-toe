@@ -54,12 +54,6 @@ class Server(state: ServerState) extends Http4sDsl[IO] {
         gameState <- gameStateRef.get
         response <- handleAcceptReset(entity: Entity, gameState: Game)
       } yield response
-    case POST -> Root / "quit" =>
-      // if GameOver: puts game in Quit (1 or 2) state (waiting for remaining player to acknowledge)
-      // if Ready: puts game in Init state
-      Ok("not implemented yet")
-    case POST -> Root / "acknowledge-quit" =>
-      Ok("not implemented yet")
   }
 
   private def handleRoot(

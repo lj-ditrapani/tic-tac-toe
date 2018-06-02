@@ -37,15 +37,9 @@ final case class GameOver(ending: Ending, board: Board) extends Game {
 }
 
 final case class Reset(player: Player, board: Board) extends Game {
-  def toResponse = "X" + player.toResponse + board.toResponse
+  def toResponse = "S" + player.toResponse + board.toResponse
   override def toString = s"game.Reset $player $board"
   def toMessage(entity: Entity) = entity.resetMessage(player)
-}
-
-final case class Quit(player: Player, board: Board) extends Game {
-  def toResponse = "Q" + player.toResponse + board.toResponse
-  override def toString = s"game.Quit $player $board"
-  def toMessage(entity: Entity) = entity.quitMessage(player)
 }
 
 object Game {
@@ -63,10 +57,8 @@ object Game {
       case "G1" => GameOver(P1Wins, Board.fromStatusString(status))
       case "G2" => GameOver(P2Wins, Board.fromStatusString(status))
       case "GT" => GameOver(Tie, Board.fromStatusString(status))
-      case "X1" => Reset(Player1, Board.fromStatusString(status))
-      case "X2" => Reset(Player2, Board.fromStatusString(status))
-      case "Q1" => Quit(Player1, Board.fromStatusString(status))
-      case "Q2" => Quit(Player2, Board.fromStatusString(status))
+      case "S1" => Reset(Player1, Board.fromStatusString(status))
+      case "S2" => Reset(Player2, Board.fromStatusString(status))
       case _ => throw new IllegalArgumentException(s"Unknown game status in $status")
     }
   }

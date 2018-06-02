@@ -9,10 +9,8 @@ class GameTest extends Spec {
   private val boardG1 = "2G1OOOEEEEEE"
   private val boardG2 = "1G2EEEEEEXXX"
   private val boardGT = "2GTXXOOOXXXO"
-  private val boardX1 = "2X1XXOOOXXXO"
-  private val boardX2 = "2X2XXOOOXXXO"
-  private val boardQ1 = "2Q1XXOOOXXXO"
-  private val boardQ2 = "2Q2XXOOOXXXO"
+  private val boardS1 = "2S1XXOOOXXXO"
+  private val boardS2 = "2S2XXOOOXXXO"
 
   "fromStatusString" - {
     val tests = List(
@@ -24,10 +22,8 @@ class GameTest extends Spec {
       (boardG1, GameOver(P1Wins, Board.fromStatusString(boardG1))),
       (boardG2, GameOver(P2Wins, Board.fromStatusString(boardG2))),
       (boardGT, GameOver(Tie, Board.fromStatusString(boardGT))),
-      (boardX1, Reset(Player1, Board.fromStatusString(boardX1))),
-      (boardX2, Reset(Player2, Board.fromStatusString(boardX2))),
-      (boardQ1, Quit(Player1, Board.fromStatusString(boardQ1))),
-      (boardQ2, Quit(Player2, Board.fromStatusString(boardQ2))),
+      (boardS1, Reset(Player1, Board.fromStatusString(boardS1))),
+      (boardS2, Reset(Player2, Board.fromStatusString(boardS2))),
     )
 
     for ((status, game) <- tests) {
@@ -45,7 +41,7 @@ class GameTest extends Spec {
     }
 
     "throws an IllegalArgumentException if status string has unknow game status" in {
-      an[IllegalArgumentException] should be thrownBy { Game.fromStatusString("1XXEEEAAAEEE") }
+      an[IllegalArgumentException] should be thrownBy { Game.fromStatusString("1SXEEEAAAEEE") }
     }
   }
 
@@ -58,10 +54,8 @@ class GameTest extends Spec {
       (Turn(Player2, Board.fromStatusString(boardT2)), "T2EEEXXXEEE"),
       (GameOver(P1Wins, Board.fromStatusString(boardG1)), "G1OOOEEEEEE"),
       (GameOver(P2Wins, Board.fromStatusString(boardG2)), "G2EEEEEEXXX"),
-      (Reset(Player1, Board.fromStatusString(boardX1)), "X1XXOOOXXXO"),
-      (Reset(Player2, Board.fromStatusString(boardX1)), "X2XXOOOXXXO"),
-      (Quit(Player1, Board.fromStatusString(boardQ2)), "Q1XXOOOXXXO"),
-      (Quit(Player2, Board.fromStatusString(boardQ2)), "Q2XXOOOXXXO"),
+      (Reset(Player1, Board.fromStatusString(boardS1)), "S1XXOOOXXXO"),
+      (Reset(Player2, Board.fromStatusString(boardS1)), "S2XXOOOXXXO"),
     )
 
     for ((game, status) <- tests) {
@@ -84,8 +78,7 @@ class GameTest extends Spec {
       (GameOver(P1Wins, Board.fromStatusString(boardG1)), Spectator, "Player 1 wins!"),
       (GameOver(P1Wins, Board.fromStatusString(boardG1)), Actor.player1, "You win!"),
       (GameOver(P2Wins, Board.fromStatusString(boardG2)), Actor.player1, "You loose :("),
-      (Reset(Player1, Board.fromStatusString(boardX1)), Actor.player2, rematchMesssage),
-      (Quit(Player2, Board.fromStatusString(boardQ2)), Actor.player2, "You quit...quitter"),
+      (Reset(Player1, Board.fromStatusString(boardS1)), Actor.player2, rematchMesssage),
     )
 
     for ((game, player, message) <- tests) {

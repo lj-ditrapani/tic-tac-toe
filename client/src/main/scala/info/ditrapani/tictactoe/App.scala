@@ -95,13 +95,7 @@ object App {
         })("Reset"),
         button(id := "accept-reset-button", disabled := true, onclick := { () =>
           postAcceptReset()
-        })("Accept Reset"),
-        button(id := "quit-button", disabled := true, onclick := { () =>
-          println("Quit")
-        })("Quit"),
-        button(id := "acknowledge-quit-button", disabled := true, onclick := { () =>
-          println("Acknowledge Quit")
-        })("Acknowledge Quit")
+        })("Accept Reset")
       )
     )
     jQuery("head").append(s"<style>${Styles.styleSheetText}</style>")
@@ -133,13 +127,11 @@ object App {
     renderBoard(gameState.board)
     (gameState -> entity) match {
       case (game.GameOver(_, _), _) =>
-        enableButtons(true, false, true, false)
+        enableButtons(true, false)
       case (game.Reset(resetPlayer, _), Actor(self)) if resetPlayer != self =>
-        enableButtons(false, true, true, false)
-      case (game.Quit(quitPlayer, _), Actor(self)) if quitPlayer != self =>
-        enableButtons(false, false, false, true)
+        enableButtons(false, true)
       case _ =>
-        enableButtons(false, false, false, false)
+        enableButtons(false, false)
     }
     (): Unit
   }
@@ -169,14 +161,10 @@ object App {
 
   def enableButtons(
       reset: Boolean,
-      acceptReset: Boolean,
-      quit: Boolean,
-      acknowledgeQuit: Boolean
+      acceptReset: Boolean
   ): Unit = {
     jQuery("#reset-button").attr("disabled", !reset)
     jQuery("#accept-reset-button").attr("disabled", !acceptReset)
-    jQuery("#quit-button").attr("disabled", !quit)
-    jQuery("#acknowledge-quit-button").attr("disabled", !acknowledgeQuit)
     (): Unit
   }
 }

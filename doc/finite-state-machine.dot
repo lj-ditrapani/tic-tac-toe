@@ -1,12 +1,8 @@
 digraph {
 Init -> Ready[label="P1 GET /"];
-Ready -> Turn[label="GET /"];
-Ready -> Init[label="POST /quit"];
+Ready -> Turn[label="P2 GET /"];
 Turn -> Turn[label="POST /play", color="blue"];
 Turn -> GameOver[label="winning move", color="red"];
 GameOver -> Reset[label="POST /reset"];
-GameOver -> Quit[label="POST /quit"];
 Reset -> Turn[label="POST /accept-reset"];
-Reset -> Quit[label="POST /quit"];
-Quit -> Ready[label="POST /acknowledge-quit"];
 }
