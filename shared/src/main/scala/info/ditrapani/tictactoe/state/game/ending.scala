@@ -22,3 +22,5 @@ object Tie extends Ending {
   def toMessage() = "It's a tie!"
   override def toString() = "Tie"
 }
+
+final case class EndingLines(ending: Ending, lines: List[List[Int]])
