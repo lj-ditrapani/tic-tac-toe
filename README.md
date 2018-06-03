@@ -4,6 +4,7 @@ Tic-tac-toe
 LAN multiplayer tic-tac-toe client/server in scala using http4s & scala.js
 
 Screenshot:
+
 ![doc/client.png](doc/client.png)
 
 
@@ -67,6 +68,7 @@ Status string: 12 characters with format PSSCCCCCCCCC where
     - O: player 2 has an O here
 
 Finite State Machine:
+
 ![doc/finite-state-machine.png](doc/finite-state-machine.png)
 
 
