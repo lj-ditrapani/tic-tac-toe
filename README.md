@@ -72,12 +72,15 @@ Status string: 12 characters with format PSSCCCCCCCCC where
 TODO
 ----
 
-- Update libs
+- creat a copyJs task, then a buildAll command
+  "client/fullOptJs" :: "copyJs" :: "server/assembly" :: state
+    - delete the copy.sh script
+    - update usage in readme
 - get /root in ReadyPlayer1:
   if valid player 1 (cookie id set correctly),
   don't set cookie ID to player2!
 - Write all server endpoint tests
-- Bad requests/forbidden should return 400 (bad request) 403 (forbidden)
+- Bad requests/forbidden could return 400 (bad request) 403 (forbidden)
     - POST play with index out of bounds
     - POST play with index not empty cell
     - Player1 trying to POST play on Player2's turn

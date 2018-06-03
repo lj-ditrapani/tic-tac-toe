@@ -31,7 +31,7 @@ lazy val shared = crossProject.crossType(CrossType.Pure).in(file("shared")).sett
 lazy val sharedJvm = shared.jvm
 lazy val sharedJs = shared.js
 
-val Http4sVersion = "0.18.11"
+val Http4sVersion = "0.18.12"
 
 lazy val server = project
   .in(file("server"))
