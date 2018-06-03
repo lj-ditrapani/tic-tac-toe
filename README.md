@@ -3,6 +3,7 @@ Tic-tac-toe
 
 LAN multiplayer tic-tac-toe client/server in scala using http4s & scala.js
 
+Screenshot:
 ![doc/client.png](doc/client.png)
 
 
@@ -10,15 +11,14 @@ Run it!
 -------
 
 ```
-sbt client/fullOptJS
-bash copy.sh
-sbt server/assembly
+sbt build
 java -jar server/target/scala-2.12/server-assembly-x.x.x.jar
 ```
 
 Open `localhost:8080/` in browser.
 Then have your friend (assuming you have friends) open `<your ip>:8080/` in their browser.
 If you have no friends, open a private/incognito browser window to play against yourself.
+
 
 Notes
 -----
@@ -66,6 +66,7 @@ Status string: 12 characters with format PSSCCCCCCCCC where
     - X: player 1 has an X here
     - O: player 2 has an O here
 
+Finite State Machine:
 ![doc/finite-state-machine.png](doc/finite-state-machine.png)
 
 
