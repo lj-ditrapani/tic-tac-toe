@@ -68,8 +68,8 @@ object App {
     import scalatags.JsDom.all._
     val bgImg = "img/bg.png"
 
-    val d = div(
-      h1("Tic-tac-toe"),
+    val d = div(Styles.body)(
+      h1(Styles.h1)("Tic-tac-toe"),
       p(id := "entity")("Player Unknown"),
       p(id := "message")("Loading..."),
       div(Styles.frame)(
@@ -89,11 +89,11 @@ object App {
                 }
             )
       ),
-      div(Styles.buttons)(
-        button(id := "reset-button", disabled := true, onclick := { () =>
+      div(Styles.buttonBox)(
+        button(Styles.button)(id := "reset-button", disabled := true, onclick := { () =>
           postReset()
         })("Reset"),
-        button(id := "accept-reset-button", disabled := true, onclick := { () =>
+        button(Styles.button)(id := "accept-reset-button", disabled := true, onclick := { () =>
           postAcceptReset()
         })("Accept Reset")
       )
@@ -177,12 +177,16 @@ object Styles extends StyleSheet {
   import scalatags.JsDom.implicits._
   initStyleSheet()
 
+  val boxSide = 128
+  val boxBorder = 8
+  val boxWithBorder = 128 + 2 * 8
+
   val box = cls(
     s.display := "inline-block",
     s.backgroundColor := "white",
-    s.height := 128,
-    s.width := 128,
-    s.border := "2px solid white",
+    s.height := boxSide,
+    s.width := boxSide,
+    s.border := "8px solid white",
   )
 
   val availableBox = cls(
@@ -196,16 +200,46 @@ object Styles extends StyleSheet {
   )
 
   val row = cls(
-    s.height := 132,
-    s.width := 396
+    s.height := boxWithBorder,
+    s.width := boxWithBorder * 3
   )
 
   val frame = cls(
-    s.width := 396,
-    s.padding := 2
+    s.width := boxWithBorder
   )
 
-  val buttons = cls(
-    s.padding := 10
+  val body = cls(
+    s.fontFamily := "'Press Start 2P'",
+    s.fontSize := "16px"
+  )
+
+  val h1 = cls(
+    s.fontSize := "16px",
+    s.fontWeight := "normal"
+  )
+
+  val buttonBox = cls(
+    s.padding := 8
+  )
+
+  val button = cls(
+    s.fontFamily := "'Press Start 2P'",
+    s.fontSize := "16px",
+    s.border := "none",
+    s.textAlign := "center",
+    s.padding := "16px 32px",
+    s.marginRight := 16,
+    s.cursor := "pointer",
+    s.backgroundColor := "#000000",
+    s.color := "#FFFFFF",
+    &.hover(
+      s.backgroundColor := "#555555",
+      s.color := "#FFFFFF"
+    ),
+    &.disabled(
+      s.backgroundColor := "#AAAAAA",
+      s.color := "#555555",
+      s.cursor := "default"
+    )
   )
 }
