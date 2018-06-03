@@ -1,3 +1,5 @@
+import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
+
 lazy val commonSettings = Seq(
   organization := "info.ditrapani",
   version := "1.0.2",
@@ -27,7 +29,7 @@ lazy val commonSettings = Seq(
   )
 )
 
-lazy val shared = crossProject.crossType(CrossType.Pure).in(file("shared")).settings(commonSettings)
+lazy val shared = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure).in(file("shared")).settings(commonSettings)
 lazy val sharedJvm = shared.jvm
 lazy val sharedJs = shared.js
 
