@@ -14,7 +14,7 @@ class EntityTest extends Spec {
     }
 
     "readyMessage" in {
-      Spectator.readyMessage(Player1) shouldBe "Player 1 has joined.  Waiting for Player 2 to join."
+      Spectator.readyMessage() shouldBe "Player 1 has joined.  Waiting for Player 2 to join."
     }
 
     "turnMessage" in {
@@ -36,7 +36,7 @@ class EntityTest extends Spec {
 
   "Actor" - {
     "readyMessage" in {
-      Actor.player1.readyMessage(Player2) shouldBe "Waiting for Player 1 to join."
+      Actor.player1.readyMessage() shouldBe "Waiting for Player 2 to join."
     }
 
     "turnMessage" - {

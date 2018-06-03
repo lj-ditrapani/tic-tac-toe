@@ -5,7 +5,7 @@ import fs2.async.Ref
 import org.http4s.{HttpService, Request, Response, StaticFile}
 import org.http4s.dsl.Http4sDsl
 import org.http4s.{Cookie, headers}
-import state.{Actor, Board, Entity, Player, Player1, Spectator}
+import state.{Actor, Board, Entity, Player, Spectator}
 import state.game
 import game.Game
 import state.cell
@@ -64,15 +64,14 @@ class Server(state: ServerState) extends Http4sDsl[IO] {
     gameState match {
       case game.Init =>
         gameStateRef
-          .setSync(game.Ready(Player1))
+          .setSync(game.ReadyPlayer1)
           .map(_ => response.addCookie(Cookie("id", p1Id.toString)))
-      case game.Ready(player) =>
-        val id = if (player == Player1) { p2Id } else { p1Id }
+      case game.ReadyPlayer1 =>
         // get Option[Cookie ID] from Request Header
         // if present and valid; don't set it again
         gameStateRef
           .setSync(game.Turn(firstPlayer, Board.init))
-          .map(_ => response.addCookie(Cookie("id", id.toString)))
+          .map(_ => response.addCookie(Cookie("id", p2Id.toString)))
       case _ => IO.pure(response)
     }
 

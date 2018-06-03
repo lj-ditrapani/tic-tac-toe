@@ -4,7 +4,7 @@ import game.{Ending, P1Wins, P2Wins, Tie}
 
 sealed abstract class Entity {
   def toResponse: String
-  def readyMessage(readyPlayer: Player): String
+  def readyMessage(): String
   def turnMessage(turnPlayer: Player): String
   def gameOverMessage(ending: Ending): String
   def resetMessage(resetter: Player): String
@@ -16,8 +16,8 @@ object Spectator extends Entity {
 
   def toResponse = "S"
 
-  def readyMessage(readyPlayer: Player) =
-    s"$readyPlayer has joined.  " + Entity.waitingMessage(readyPlayer.toggle)
+  def readyMessage =
+    s"Player 1 has joined.  " + Entity.waitingMessage
 
   def turnMessage(turnPlayer: Player) = s"$turnPlayer's turn"
 
@@ -33,8 +33,7 @@ final case class Actor(player: Player) extends Entity {
 
   def toResponse = player.toResponse
 
-  def readyMessage(readyPlayer: Player) =
-    Entity.waitingMessage(readyPlayer.toggle)
+  def readyMessage() = Entity.waitingMessage
 
   def turnMessage(turnPlayer: Player) =
     if (player == turnPlayer) {
@@ -80,5 +79,5 @@ object Entity {
       case char => throw new IllegalArgumentException(s"Uknown entity char $char")
     }
 
-  def waitingMessage(player: Player): String = s"Waiting for $player to join."
+  val waitingMessage: String = s"Waiting for Player 2 to join."
 }

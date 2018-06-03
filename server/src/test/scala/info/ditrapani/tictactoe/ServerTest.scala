@@ -57,14 +57,14 @@ class ServerTest extends AsyncSpec with KleisliSyntax with OptionValues {
           result.setCookie.value shouldBe "id=1"
           result.contentType shouldBe "text/html"
           result.body shouldBe Source.fromResource("index.html").mkString
-          result.gameState shouldBe game.Ready(Player1)
+          result.gameState shouldBe game.ReadyPlayer1
         })
         .unsafeToFuture
     }
 
-    "when game.Player1Ready" - {
+    "when game.ReadyPlayer1" - {
       "and player's cookie id != player1 id; sets cookie to Player2 & advances state" in {
-        new Test(game.Ready(Player1), Player1, Method.GET, Uri.uri("/"), None)
+        new Test(game.ReadyPlayer1, Player1, Method.GET, Uri.uri("/"), None)
           .run()
           .map(result => {
             result.statusCode shouldBe Status.Ok
@@ -77,14 +77,14 @@ class ServerTest extends AsyncSpec with KleisliSyntax with OptionValues {
       }
 
       "and player's cookie id == player1 id; does not set cookie again or advance state" ignore {
-        new Test(game.Ready(Player1), Player1, Method.GET, Uri.uri("/"), Some("1"))
+        new Test(game.ReadyPlayer1, Player1, Method.GET, Uri.uri("/"), Some("1"))
           .run()
           .map(result => {
             result.statusCode shouldBe Status.Ok
             result.setCookie shouldBe None
             result.contentType shouldBe "text/html"
             result.body shouldBe Source.fromResource("index.html").mkString
-            result.gameState shouldBe game.Ready(Player1)
+            result.gameState shouldBe game.ReadyPlayer1
           })
           .unsafeToFuture
       }

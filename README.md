@@ -54,7 +54,6 @@ Status string: 12 characters with format PSSCCCCCCCCC where
 - SS: Game state
     - IN: Init
     - R1: Ready player 1
-    - R2: Ready player 2
     - T1: Turn player 1
     - T2: Turn player 2
     - G1: GameOver; player 1 wins
@@ -73,10 +72,10 @@ Status string: 12 characters with format PSSCCCCCCCCC where
 TODO
 ----
 
-- Change reset code from X to S
-- Remove ready player2?
-- Remove Quit state
 - Update screenshot
+- get /root in ReadyPlayer1:
+  if valid player 1 (cookie id set correctly),
+  don't set cookie ID to player2!
 - Write all server endpoint tests
 - Bad requests/forbidden should return 400 (bad request) 403 (forbidden)
     - POST play with index out of bounds

@@ -15,8 +15,7 @@ class GameTest extends Spec {
   "fromStatusString" - {
     val tests = List(
       ("1INEEEEEEEEE", Init),
-      ("1R1EEEEEEEEE", Ready(Player1)),
-      ("1R2EEEEEEEEE", Ready(Player2)),
+      ("1R1EEEEEEEEE", ReadyPlayer1),
       (boardT1, Turn(Player1, Board.fromStatusString(boardT1))),
       (boardT2, Turn(Player2, Board.fromStatusString(boardT2))),
       (boardG1, GameOver(P1Wins, Board.fromStatusString(boardG1))),
@@ -48,8 +47,7 @@ class GameTest extends Spec {
   "toResponse" - {
     val tests = List(
       (Init, "INEEEEEEEEE"),
-      (Ready(Player1), "R1EEEEEEEEE"),
-      (Ready(Player2), "R2EEEEEEEEE"),
+      (ReadyPlayer1, "R1EEEEEEEEE"),
       (Turn(Player1, Board.fromStatusString(boardT1)), "T1XXXOOOXXX"),
       (Turn(Player2, Board.fromStatusString(boardT2)), "T2EEEXXXEEE"),
       (GameOver(P1Wins, Board.fromStatusString(boardG1)), "G1OOOEEEEEE"),
@@ -70,9 +68,8 @@ class GameTest extends Spec {
 
     val tests = List(
       (Init, Actor.player1, "No players have joined yet..."),
-      (Ready(Player1), Actor.player1, "Waiting for Player 2 to join."),
-      (Ready(Player1), Spectator, "Player 1 has joined.  Waiting for Player 2 to join."),
-      (Ready(Player2), Actor.player1, "Waiting for Player 1 to join."),
+      (ReadyPlayer1, Actor.player1, "Waiting for Player 2 to join."),
+      (ReadyPlayer1, Spectator, "Player 1 has joined.  Waiting for Player 2 to join."),
       (Turn(Player1, Board.fromStatusString(boardT1)), Actor.player1, "Your turn"),
       (Turn(Player2, Board.fromStatusString(boardT2)), Actor.player1, "Player 2's turn"),
       (GameOver(P1Wins, Board.fromStatusString(boardG1)), Spectator, "Player 1 wins!"),

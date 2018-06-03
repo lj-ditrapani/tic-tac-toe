@@ -17,10 +17,10 @@ object Init extends Game {
   val board: Board = Board.init
 }
 
-final case class Ready(player: Player) extends Game {
-  def toResponse = "R" + player.toResponse + Game.emptyBoard
-  override def toString = s"game.Ready ${player}"
-  def toMessage(entity: Entity) = entity.readyMessage(player)
+object ReadyPlayer1 extends Game {
+  def toResponse = "R1" + Game.emptyBoard
+  override def toString = s"game.Ready Player 1"
+  def toMessage(entity: Entity) = entity.readyMessage()
   val board: Board = Board.init
 }
 
@@ -50,8 +50,7 @@ object Game {
     require(status.length == 12)
     status.substring(1, 3) match {
       case "IN" => Init
-      case "R1" => Ready(Player1)
-      case "R2" => Ready(Player2)
+      case "R1" => ReadyPlayer1
       case "T1" => Turn(Player1, Board.fromStatusString(status))
       case "T2" => Turn(Player2, Board.fromStatusString(status))
       case "G1" => GameOver(P1Wins, Board.fromStatusString(status))
