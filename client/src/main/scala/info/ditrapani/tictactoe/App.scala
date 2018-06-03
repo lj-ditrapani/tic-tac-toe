@@ -68,7 +68,7 @@ object App {
     import scalatags.JsDom.all._
     val bgImg = "img/bg.png"
 
-    val d = div(Styles.body)(
+    val d = div(
       h1("Tic-tac-toe"),
       p(id := "entity")("Player Unknown"),
       p(id := "message")("Loading..."),
@@ -89,7 +89,7 @@ object App {
                 }
             )
       ),
-      div(
+      div(Styles.buttons)(
         button(id := "reset-button", disabled := true, onclick := { () =>
           postReset()
         })("Reset"),
@@ -205,5 +205,7 @@ object Styles extends StyleSheet {
     s.padding := 2
   )
 
-  val body = cls()
+  val buttons = cls(
+    s.padding := 10
+  )
 }
