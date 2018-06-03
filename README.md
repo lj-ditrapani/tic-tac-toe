@@ -25,7 +25,7 @@ Notes
 
 Game States
 - Init
-- Ready
+- ReadyPlayer1
 - Turn
 - GameOver
 - Reset
@@ -72,18 +72,21 @@ Status string: 12 characters with format PSSCCCCCCCCC where
 TODO
 ----
 
-- creat a copyJs task, then a buildAll command
-  "client/fullOptJs" :: "copyJs" :: "server/assembly" :: state
-    - delete the copy.sh script
-    - update usage in readme
 - get /root in ReadyPlayer1:
   if valid player 1 (cookie id set correctly),
   don't set cookie ID to player2!
 - Write all server endpoint tests
-- Bad requests/forbidden could return 400 (bad request) 403 (forbidden)
+- Rewrite client using immutable store architecture
+- Style & images
+    - Instead of "highlighting" slected cell via boarder color;
+      remove border, and change background color of cell from white to red.
+      Gives a more retro look.
+    - Change font to be Commodore64-like.
+    - Make buttons look "8-bit"
+    - Use keyboard controls instead of mouse
+- Maybe bad requests/forbidden should return 400 (bad request) 403 (forbidden)
     - POST play with index out of bounds
     - POST play with index not empty cell
     - Player1 trying to POST play on Player2's turn
     - Player trying to POST play in wrong game state
     - POST reset when not game over
-- Rewrite client using immutable store architecture
