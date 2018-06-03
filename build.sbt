@@ -68,6 +68,26 @@ sharedJs / scalafmtOnCompile := true
 server / scalafmtOnCompile := true
 client / scalafmtOnCompile := true
 
+lazy val copyJs = taskKey[Unit]("Copies client Javascript files to server resources.")
+copyJs := {
+  val log = streams.value.log
+  log.info("Copying client Javascript files to server resources.")
+  import java.nio.file.Files
+  val jsFileNames = List("client-jsdeps.min.js", "client-opt.js", "client-opt.js.map")
+  val dir = baseDirectory.value
+  jsFileNames.foreach(name =>
+      Files.copy(
+        new File(dir, s"client/target/scala-2.12/$name").toPath,
+        new File(dir, s"server/src/main/resources/js/$name").toPath,
+        java.nio.file.StandardCopyOption.REPLACE_EXISTING
+      )
+  )
+}
+
 commands += Command.command("checkCoverage") { state =>
   "coverage" :: "sharedJVM/clean" :: "sharedJVM/test" :: "coverageReport" :: state
+}
+
+commands += Command.command("build") { state =>
+  "client/fullOptJS" :: "copyJs" :: "server/assembly" :: state
 }
