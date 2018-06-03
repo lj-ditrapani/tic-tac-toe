@@ -72,7 +72,7 @@ Status string: 12 characters with format PSSCCCCCCCCC where
 TODO
 ----
 
-- Update screenshot
+- Update libs
 - get /root in ReadyPlayer1:
   if valid player 1 (cookie id set correctly),
   don't set cookie ID to player2!
