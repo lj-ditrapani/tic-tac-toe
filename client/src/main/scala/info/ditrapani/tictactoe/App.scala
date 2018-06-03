@@ -126,7 +126,7 @@ object App {
     jQuery("#message").text(s"${gameState.toMessage(entity)}")
     renderBoard(gameState.board)
     (gameState -> entity) match {
-      case (game.GameOver(_, _), _) =>
+      case (game.GameOver(_, _), Actor(_)) =>
         enableButtons(true, false)
       case (game.Reset(resetPlayer, _), Actor(self)) if resetPlayer != self =>
         enableButtons(false, true)
