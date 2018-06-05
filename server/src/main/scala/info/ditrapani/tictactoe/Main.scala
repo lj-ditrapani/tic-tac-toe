@@ -8,11 +8,11 @@ import StreamApp.ExitCode
 
 object Main extends StreamApp[IO] {
   def stream(args: List[String], requestShutdown: IO[Unit]): Stream[IO, ExitCode] =
-    Stream.eval(ServerState.init()).flatMap(serverStream)
+    Stream.eval(Args.init()).flatMap(serverStream)
 
-  private def serverStream(serverState: ServerState): Stream[IO, ExitCode] =
+  private def serverStream(args: Args): Stream[IO, ExitCode] =
     BlazeBuilder[IO]
       .bindHttp(8080, "0.0.0.0")
-      .mountService(new Server(serverState).service, "/")
+      .mountService(new Server(args).service, "/")
       .serve(Effect[IO], ExecutionContext.global)
 }

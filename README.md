@@ -75,9 +75,9 @@ Finite State Machine:
 TODO
 ----
 
-- get /root in ReadyPlayer1:
-  if valid player 1 (cookie id set correctly),
-  don't set cookie ID to player2!
+- Fix any concurrency issues
+    - combine state into one ref
+    - handleReset must happen inside ref.modify
 - Write all server endpoint tests
 - Rewrite client using immutable store architecture
 - Maybe bad requests/forbidden should return 400 (bad request) 403 (forbidden)

@@ -28,8 +28,8 @@ class Test(gameState: Game, player: Player, method: Method, path: Uri, id: Optio
       id.map(value => temp.addCookie("id", value)).getOrElse(temp)
     }
     for {
-      serverState <- makeServerState(gameState, player)
-      server = new Server(serverState)
+      args <- makeArgs(gameState, player)
+      server = new Server(args)
       response <- server.service.orNotFound.run(request)
       body <- response.body.map(_.toChar).compile.toVector
       newGameState <- server.gameStateRef.get
@@ -39,11 +39,11 @@ class Test(gameState: Game, player: Player, method: Method, path: Uri, id: Optio
     } yield Result(response.status, setCookie, contentType, body.mkString(""), newGameState)
   }
 
-  def makeServerState(gameState: game.Game, player: Player): IO[ServerState] =
+  def makeArgs(gameState: game.Game, player: Player): IO[Args] =
     for {
       gameStateRef <- Ref[IO, Game](gameState)
       playerRef <- Ref[IO, Player](player)
-    } yield ServerState(1, 2, gameStateRef, playerRef)
+    } yield Args(1, 2, gameStateRef, playerRef)
 }
 
 @SuppressWarnings(Array("org.wartremover.warts.Throw"))
@@ -76,7 +76,7 @@ class ServerTest extends AsyncSpec with KleisliSyntax with OptionValues {
           .unsafeToFuture
       }
 
-      "and player's cookie id == player1 id; does not set cookie again or advance state" ignore {
+      "and player's cookie id == player1 id; does not set cookie again or advance state" in {
         new Test(game.ReadyPlayer1, Player1, Method.GET, Uri.uri("/"), Some("1"))
           .run()
           .map(result => {

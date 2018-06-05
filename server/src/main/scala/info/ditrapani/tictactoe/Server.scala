@@ -5,18 +5,18 @@ import fs2.async.Ref
 import org.http4s.{HttpService, Request, Response, StaticFile}
 import org.http4s.dsl.Http4sDsl
 import org.http4s.{Cookie, headers}
-import state.{Actor, Board, Entity, Player, Spectator}
+import state.{Actor, Board, Entity, Player, Player1, Spectator}
 import state.game
 import game.Game
 import state.cell
 
-class Server(state: ServerState) extends Http4sDsl[IO] {
-  private val p1Id = state.p1Id
-  private val p2Id = state.p2Id
+class Server(args: Args) extends Http4sDsl[IO] {
+  private val p1Id = args.p1Id
+  private val p2Id = args.p2Id
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
-  var gameStateRef: Ref[IO, Game] = state.game
+  var gameStateRef: Ref[IO, Game] = args.game
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
-  var firstPlayerRef: Ref[IO, Player] = state.firstPlayer
+  var firstPlayerRef: Ref[IO, Player] = args.firstPlayer
 
   @SuppressWarnings(Array("org.wartremover.warts.Nothing"))
   def static(file: String, request: Request[IO]): IO[Response[IO]] =
@@ -25,10 +25,8 @@ class Server(state: ServerState) extends Http4sDsl[IO] {
   val service: HttpService[IO] = HttpService[IO] {
     case request @ GET -> Root =>
       for {
-        gameState <- gameStateRef.get
-        firstPlayer <- firstPlayerRef.get
         responseWithFile <- static("index.html", request)
-        fullResponse <- handleRoot(gameState, firstPlayer, responseWithFile)
+        fullResponse <- handleRoot(getEntity(request), responseWithFile)
       } yield fullResponse
     case request @ GET -> Root / "js" / file =>
       static(s"js/$file", request)
@@ -56,24 +54,29 @@ class Server(state: ServerState) extends Http4sDsl[IO] {
       } yield response
   }
 
-  private def handleRoot(
-      gameState: Game,
-      firstPlayer: Player,
-      response: Response[IO]
-  ): IO[Response[IO]] =
-    gameState match {
-      case game.Init =>
-        gameStateRef
-          .setSync(game.ReadyPlayer1)
-          .map(_ => response.addCookie(Cookie("id", p1Id.toString)))
-      case game.ReadyPlayer1 =>
-        // get Option[Cookie ID] from Request Header
-        // if present and valid; don't set it again
-        gameStateRef
-          .setSync(game.Turn(firstPlayer, Board.init))
-          .map(_ => response.addCookie(Cookie("id", p2Id.toString)))
-      case _ => IO.pure(response)
-    }
+  private def handleRoot(entity: Entity, response: Response[IO]): IO[Response[IO]] =
+    gameStateRef
+      .modify2[Option[Int]](
+        gameState =>
+          gameState match {
+            case game.Init =>
+              (game.ReadyPlayer1, Some(p1Id))
+            case game.ReadyPlayer1 =>
+              entity match {
+                case Actor(Player1) => (gameState, None)
+                case _ => (game.Turn(Player1, Board.init), Some(p2Id))
+              }
+            case _ =>
+              (gameState, None)
+        }
+      )
+      .map {
+        case (_, maybe) =>
+          maybe match {
+            case None => response
+            case Some(id) => response.addCookie(Cookie("id", id.toString))
+          }
+      }
 
   @SuppressWarnings(Array("org.wartremover.warts.Throw"))
   private def handlePlay(index: Int, entity: Entity, gameState: Game): IO[Response[IO]] =
