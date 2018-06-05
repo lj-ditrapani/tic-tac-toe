@@ -1,4 +1,4 @@
-package info.ditrapani.tictactoe.state.game
+package info.ditrapani.tictactoe.model.game
 
 sealed abstract class Ending {
   def toResponse(): String

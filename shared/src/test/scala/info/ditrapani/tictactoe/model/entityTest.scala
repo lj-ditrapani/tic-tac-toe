@@ -1,4 +1,4 @@
-package info.ditrapani.tictactoe.state
+package info.ditrapani.tictactoe.model
 
 import game.{P1Wins, P2Wins, Tie}
 import info.ditrapani.tictactoe.Spec

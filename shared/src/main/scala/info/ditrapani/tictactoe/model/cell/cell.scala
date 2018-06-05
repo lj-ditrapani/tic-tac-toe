@@ -1,4 +1,4 @@
-package info.ditrapani.tictactoe.state.cell
+package info.ditrapani.tictactoe.model.cell
 
 sealed abstract class Cell {
   def toResponse: String

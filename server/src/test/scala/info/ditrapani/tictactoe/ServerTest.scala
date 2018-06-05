@@ -6,9 +6,9 @@ import org.http4s.{Method, Request, Status, Uri}
 import org.http4s.syntax.KleisliSyntax
 import org.http4s.util.CaseInsensitiveString
 import org.scalatest.OptionValues
-import state.game
+import model.game
 import game.Game
-import state.{Board, Player, Player1, Player2}
+import model.{Board, Player, Player1, Player2}
 import scala.io.Source
 
 final case class Result(
@@ -32,7 +32,8 @@ class Test(gameState: Game, player: Player, method: Method, path: Uri, id: Optio
       server = new Server(args)
       response <- server.service.orNotFound.run(request)
       body <- response.body.map(_.toChar).compile.toVector
-      newGameState <- server.gameStateRef.get
+      state <- server.stateRef.get
+      newGameState = state.game
       headers = response.headers
       setCookie = headers.get(CaseInsensitiveString("Set-Cookie")).map(_.value)
       contentType = headers.get(CaseInsensitiveString("Content-Type")).map(_.value).get
@@ -41,9 +42,8 @@ class Test(gameState: Game, player: Player, method: Method, path: Uri, id: Optio
 
   def makeArgs(gameState: game.Game, player: Player): IO[Args] =
     for {
-      gameStateRef <- Ref[IO, Game](gameState)
-      playerRef <- Ref[IO, Player](player)
-    } yield Args(1, 2, gameStateRef, playerRef)
+      stateRef <- Ref[IO, State](State(gameState, player))
+    } yield Args(1, 2, stateRef)
 }
 
 @SuppressWarnings(Array("org.wartremover.warts.Throw"))

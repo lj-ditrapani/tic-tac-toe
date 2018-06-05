@@ -5,18 +5,15 @@ import fs2.async.Ref
 import org.http4s.{HttpService, Request, Response, StaticFile}
 import org.http4s.dsl.Http4sDsl
 import org.http4s.{Cookie, headers}
-import state.{Actor, Board, Entity, Player, Player1, Spectator}
-import state.game
+import model.{Actor, Board, Entity, Player, Player1, Spectator}
+import model.game
 import game.Game
-import state.cell
+import model.cell
 
 class Server(args: Args) extends Http4sDsl[IO] {
   private val p1Id = args.p1Id
   private val p2Id = args.p2Id
-  @SuppressWarnings(Array("org.wartremover.warts.Var"))
-  var gameStateRef: Ref[IO, Game] = args.game
-  @SuppressWarnings(Array("org.wartremover.warts.Var"))
-  var firstPlayerRef: Ref[IO, Player] = args.firstPlayer
+  val stateRef: Ref[IO, State] = args.state
 
   @SuppressWarnings(Array("org.wartremover.warts.Nothing"))
   def static(file: String, request: Request[IO]): IO[Response[IO]] =
@@ -33,43 +30,37 @@ class Server(args: Args) extends Http4sDsl[IO] {
     case request @ GET -> Root / "img" / file =>
       static(s"img/$file", request)
     case request @ GET -> Root / "status" =>
-      gameStateRef.get.flatMap(gameState => Ok(statusString(getEntity(request), gameState)))
+      stateRef.get.flatMap {
+        case State(gameState, _) => Ok(statusString(getEntity(request), gameState))
+      }
     case request @ POST -> Root / "play" / IntVar(index) =>
       val entity = getEntity(request)
       for {
-        gameState <- gameStateRef.get
-        response <- handlePlay(index: Int, entity: Entity, gameState: Game)
+        state <- stateRef.get
+        response <- handlePlay(index, entity, state.game)
       } yield response
     case request @ POST -> Root / "reset" =>
-      val entity = getEntity(request)
-      for {
-        gameState <- gameStateRef.get
-        response <- handleReset(entity: Entity, gameState: Game)
-      } yield response
+      handleReset(getEntity(request))
     case request @ POST -> Root / "accept-reset" =>
-      val entity = getEntity(request)
-      for {
-        gameState <- gameStateRef.get
-        response <- handleAcceptReset(entity: Entity, gameState: Game)
-      } yield response
+      handleAcceptReset(getEntity(request))
   }
 
   private def handleRoot(entity: Entity, response: Response[IO]): IO[Response[IO]] =
-    gameStateRef
-      .modify2[Option[Int]](
-        gameState =>
+    stateRef
+      .modify2[Option[Int]] {
+        case State(gameState, player) =>
           gameState match {
             case game.Init =>
-              (game.ReadyPlayer1, Some(p1Id))
+              (State(game.ReadyPlayer1, player), Some(p1Id))
             case game.ReadyPlayer1 =>
               entity match {
-                case Actor(Player1) => (gameState, None)
-                case _ => (game.Turn(Player1, Board.init), Some(p2Id))
+                case Actor(Player1) => (State(gameState, player), None)
+                case _ => (State(game.Turn(Player1, Board.init), player), Some(p2Id))
               }
             case _ =>
-              (gameState, None)
-        }
-      )
+              (State(gameState, player), None)
+          }
+      }
       .map {
         case (_, maybe) =>
           maybe match {
@@ -93,7 +84,7 @@ class Server(args: Args) extends Http4sDsl[IO] {
                 case None => game.Turn(player.toggle, newBoard)
                 case Some(ending) => game.GameOver(ending, newBoard)
               }
-              gameStateRef.setSync(temp).flatMap(_ => Ok(statusString(entity, temp)))
+              stateRef.modify { _.copy(game = temp) }.flatMap(_ => Ok(statusString(entity, temp)))
             } else {
               Ok(statusString(entity, gameState) + s" can't play there! $index")
             }
@@ -103,27 +94,30 @@ class Server(args: Args) extends Http4sDsl[IO] {
     }
 
   @SuppressWarnings(Array("org.wartremover.warts.Throw"))
-  private def handleReset(entity: Entity, gameState: Game): IO[Response[IO]] =
-    (gameState -> entity) match {
-      case (game.GameOver(_, board), Actor(self)) =>
-        for {
-          _ <- firstPlayerRef.modify(_.toggle)
-          _ <- gameStateRef.setSync(game.Reset(self, board))
-          response <- Ok(statusString(entity, gameState))
-        } yield response
-      case _ => Ok(statusString(entity, gameState))
-    }
+  private def handleReset(entity: Entity): IO[Response[IO]] =
+    stateRef
+      .modify(state => {
+        val State(gameState, player) = state
+        (gameState -> entity) match {
+          case (game.GameOver(_, board), Actor(self)) =>
+            State(game.Reset(self, board), player.toggle)
+          case _ =>
+            state
+        }
+      })
+      .flatMap(change => Ok(statusString(entity, change.now.game)))
 
-  private def handleAcceptReset(entity: Entity, gameState: Game): IO[Response[IO]] =
-    (gameState -> entity) match {
-      case (game.Reset(resetPlayer, _), Actor(self)) if resetPlayer != self =>
-        for {
-          firstPlayer <- firstPlayerRef.get
-          _ <- gameStateRef.setSync(game.Turn(firstPlayer, Board.init))
-          response <- Ok(statusString(entity, gameState))
-        } yield response
-      case _ => Ok(statusString(entity, gameState))
-    }
+  private def handleAcceptReset(entity: Entity): IO[Response[IO]] =
+    stateRef
+      .modify(state => {
+        val State(gameState, firstPlayer) = state
+        (gameState -> entity) match {
+          case (game.Reset(resetPlayer, _), Actor(self)) if resetPlayer != self =>
+            State(game.Turn(firstPlayer, Board.init), firstPlayer)
+          case _ => state
+        }
+      })
+      .flatMap(change => Ok(statusString(entity, change.now.game)))
 
   def statusString(entity: Entity, gameState: Game): String =
     entity.toResponse + gameState.toResponse

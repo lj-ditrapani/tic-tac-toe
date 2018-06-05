@@ -1,4 +1,4 @@
-package info.ditrapani.tictactoe.state.cell
+package info.ditrapani.tictactoe.model.cell
 
 import info.ditrapani.tictactoe.Spec
 

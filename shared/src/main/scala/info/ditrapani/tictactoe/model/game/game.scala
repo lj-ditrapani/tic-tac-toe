@@ -1,7 +1,7 @@
-package info.ditrapani.tictactoe.state.game
+package info.ditrapani.tictactoe.model.game
 
-import info.ditrapani.tictactoe.state
-import state.{Board, Entity, Player, Player1, Player2}
+import info.ditrapani.tictactoe.model
+import model.{Board, Entity, Player, Player1, Player2}
 
 sealed abstract class Game {
   def toResponse: String

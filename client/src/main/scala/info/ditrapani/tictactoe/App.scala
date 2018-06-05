@@ -8,12 +8,12 @@ import roshttp.HttpRequest
 import roshttp.Method.POST
 import roshttp.response.SimpleHttpResponse
 import scala.scalajs.js.timers
-import state.Board
-import state.cell
+import model.Board
+import model.cell
 import cell.Cell
-import state.game
+import model.game
 import game.Game
-import state.{Actor, Entity, Spectator}
+import model.{Actor, Entity, Spectator}
 
 object App {
   val host: String = document.location.host.split(":")(0)

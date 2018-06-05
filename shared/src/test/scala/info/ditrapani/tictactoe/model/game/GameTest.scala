@@ -1,7 +1,7 @@
-package info.ditrapani.tictactoe.state.game
+package info.ditrapani.tictactoe.model.game
 
 import info.ditrapani.tictactoe.Spec
-import info.ditrapani.tictactoe.state.{Actor, Board, Player1, Player2, Spectator}
+import info.ditrapani.tictactoe.model.{Actor, Board, Player1, Player2, Spectator}
 
 class GameTest extends Spec {
   private val boardT1 = "2T1XXXOOOXXX"
