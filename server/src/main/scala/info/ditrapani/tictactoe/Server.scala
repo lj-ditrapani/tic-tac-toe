@@ -30,9 +30,7 @@ class Server(args: Args) extends Http4sDsl[IO] {
     case request @ GET -> Root / "img" / file =>
       static(s"img/$file", request)
     case request @ GET -> Root / "status" =>
-      stateRef.get.flatMap {
-        case State(gameState, _) => Ok(statusString(getEntity(request), gameState))
-      }
+      stateRef.get.flatMap(state => Ok(statusString(getEntity(request), state.game)))
     case request @ POST -> Root / "play" / IntVar(index) =>
       val entity = getEntity(request)
       for {
@@ -76,7 +74,7 @@ class Server(args: Args) extends Http4sDsl[IO] {
         getBoard(player, gameState) match {
           case _ if index < 0 => Ok(statusString(entity, gameState))
           case _ if index > 8 => Ok(statusString(entity, gameState))
-          case None => Ok(statusString(entity, gameState) + s" not your turn! $index")
+          case None => Ok(statusString(entity, gameState))
           case Some(board) =>
             if (board.cells(index) == cell.Empty) {
               val newBoard = Board(board.cells.updated(index, player.token))
@@ -86,7 +84,7 @@ class Server(args: Args) extends Http4sDsl[IO] {
               }
               stateRef.modify { _.copy(game = temp) }.flatMap(_ => Ok(statusString(entity, temp)))
             } else {
-              Ok(statusString(entity, gameState) + s" can't play there! $index")
+              Ok(statusString(entity, gameState))
             }
         }
       case Spectator =>
