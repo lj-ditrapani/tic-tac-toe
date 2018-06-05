@@ -32,11 +32,7 @@ class Server(args: Args) extends Http4sDsl[IO] {
     case request @ GET -> Root / "status" =>
       stateRef.get.flatMap(state => Ok(statusString(getEntity(request), state.game)))
     case request @ POST -> Root / "play" / IntVar(index) =>
-      val entity = getEntity(request)
-      for {
-        state <- stateRef.get
-        response <- handlePlay(index, entity, state.game)
-      } yield response
+      handlePlay(index, getEntity(request))
     case request @ POST -> Root / "reset" =>
       handleReset(getEntity(request))
     case request @ POST -> Root / "accept-reset" =>
@@ -46,17 +42,17 @@ class Server(args: Args) extends Http4sDsl[IO] {
   private def handleRoot(entity: Entity, response: Response[IO]): IO[Response[IO]] =
     stateRef
       .modify2[Option[Int]] {
-        case State(gameState, player) =>
+        case State(gameState, firstPlayer) =>
           gameState match {
             case game.Init =>
-              (State(game.ReadyPlayer1, player), Some(p1Id))
+              (State(game.ReadyPlayer1, firstPlayer), Some(p1Id))
             case game.ReadyPlayer1 =>
               entity match {
-                case Actor(Player1) => (State(gameState, player), None)
-                case _ => (State(game.Turn(Player1, Board.init), player), Some(p2Id))
+                case Actor(Player1) => (State(gameState, firstPlayer), None)
+                case _ => (State(game.Turn(Player1, Board.init), firstPlayer), Some(p2Id))
               }
             case _ =>
-              (State(gameState, player), None)
+              (State(gameState, firstPlayer), None)
           }
       }
       .map {
@@ -68,28 +64,33 @@ class Server(args: Args) extends Http4sDsl[IO] {
       }
 
   @SuppressWarnings(Array("org.wartremover.warts.Throw"))
-  private def handlePlay(index: Int, entity: Entity, gameState: Game): IO[Response[IO]] =
-    entity match {
-      case Actor(player) =>
-        getBoard(player, gameState) match {
-          case _ if index < 0 => Ok(statusString(entity, gameState))
-          case _ if index > 8 => Ok(statusString(entity, gameState))
-          case None => Ok(statusString(entity, gameState))
-          case Some(board) =>
-            if (board.cells(index) == cell.Empty) {
-              val newBoard = Board(board.cells.updated(index, player.token))
-              val temp: Game = isGameOver(newBoard) match {
-                case None => game.Turn(player.toggle, newBoard)
-                case Some(ending) => game.GameOver(ending, newBoard)
-              }
-              stateRef.modify { _.copy(game = temp) }.flatMap(_ => Ok(statusString(entity, temp)))
-            } else {
-              Ok(statusString(entity, gameState))
+  private def handlePlay(index: Int, entity: Entity): IO[Response[IO]] =
+    stateRef
+      .modify(state => {
+        val gameState = state.game
+        entity match {
+          case Actor(self) =>
+            getBoard(self, gameState) match {
+              case _ if index < 0 => state
+              case _ if index > 8 => state
+              case None => state
+              case Some(board) =>
+                if (board.cells(index) == cell.Empty) {
+                  val newBoard = Board(board.cells.updated(index, self.token))
+                  val temp: Game = isGameOver(newBoard) match {
+                    case None => game.Turn(self.toggle, newBoard)
+                    case Some(ending) => game.GameOver(ending, newBoard)
+                  }
+                  state.copy(game = temp)
+                } else {
+                  state
+                }
             }
+          case Spectator =>
+            state
         }
-      case Spectator =>
-        Ok(statusString(Spectator, gameState))
-    }
+      })
+      .flatMap(change => Ok(statusString(entity, change.now.game)))
 
   @SuppressWarnings(Array("org.wartremover.warts.Throw"))
   private def handleReset(entity: Entity): IO[Response[IO]] =
