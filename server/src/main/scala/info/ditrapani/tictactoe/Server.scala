@@ -41,20 +41,20 @@ class Server(args: Args) extends Http4sDsl[IO] {
 
   private def handleRoot(entity: Entity, response: Response[IO]): IO[Response[IO]] =
     stateRef
-      .modify2[Option[Int]] {
-        case State(gameState, firstPlayer) =>
-          gameState match {
-            case game.Init =>
-              (State(game.ReadyPlayer1, firstPlayer), Some(p1Id))
-            case game.ReadyPlayer1 =>
-              entity match {
-                case Actor(Player1) => (State(gameState, firstPlayer), None)
-                case _ => (State(game.Turn(Player1, Board.init), firstPlayer), Some(p2Id))
-              }
-            case _ =>
-              (State(gameState, firstPlayer), None)
-          }
-      }
+      .modify2[Option[Int]](state => {
+        val gameState = state.game
+        gameState match {
+          case game.Init =>
+            (state.copy(game = game.ReadyPlayer1), Some(p1Id))
+          case game.ReadyPlayer1 =>
+            entity match {
+              case Actor(Player1) => (state, None)
+              case _ => (state.copy(game = game.Turn(Player1, Board.init)), Some(p2Id))
+            }
+          case _ =>
+            (state, None)
+        }
+      })
       .map {
         case (_, maybe) =>
           maybe match {
@@ -63,7 +63,6 @@ class Server(args: Args) extends Http4sDsl[IO] {
           }
       }
 
-  @SuppressWarnings(Array("org.wartremover.warts.Throw"))
   private def handlePlay(index: Int, entity: Entity): IO[Response[IO]] =
     stateRef
       .modify(state => {
@@ -92,7 +91,6 @@ class Server(args: Args) extends Http4sDsl[IO] {
       })
       .flatMap(change => Ok(statusString(entity, change.now.game)))
 
-  @SuppressWarnings(Array("org.wartremover.warts.Throw"))
   private def handleReset(entity: Entity): IO[Response[IO]] =
     stateRef
       .modify(state => {
