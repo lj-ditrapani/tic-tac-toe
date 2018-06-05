@@ -75,7 +75,6 @@ Finite State Machine:
 TODO
 ----
 
-- Fix any concurrency issues
 - Write all server endpoint tests
 - Rewrite client using immutable store architecture
 - Maybe bad requests/forbidden should return 400 (bad request) 403 (forbidden)
