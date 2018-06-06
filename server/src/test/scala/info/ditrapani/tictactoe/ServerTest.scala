@@ -201,6 +201,49 @@ class ServerTest extends AsyncSpec with KleisliSyntax with OptionValues {
         })
         .unsafeToFuture
     }
+
+    "when it is Player2's turn and player 2 moves, and the move results in a game over" in {
+      val board1 = Board.fromStatusString("---XXEEEOEEO")
+      val board2 = Board.fromStatusString("---XXOEEOEEO")
+      new Test(game.Turn(Player2, board1), Player2, Method.POST, Uri.uri("/play/2"), Some("2"))
+        .run()
+        .map(result => {
+          result.statusCode shouldBe Status.Ok
+          result.setCookie shouldBe None
+          result.contentType shouldBe "text/plain; charset=UTF-8"
+          result.body shouldBe "2G2XXOEEOEEO"
+          result.gameState shouldBe game.GameOver(game.P2Wins, board2)
+        })
+        .unsafeToFuture
+    }
+
+    "when it is Player2's turn and player 2 moves on a non-empty cell" in {
+      val board = Board.fromStatusString("---XXEEEOEEO")
+      new Test(game.Turn(Player2, board), Player2, Method.POST, Uri.uri("/play/1"), Some("2"))
+        .run()
+        .map(result => {
+          result.statusCode shouldBe Status.Ok
+          result.setCookie shouldBe None
+          result.contentType shouldBe "text/plain; charset=UTF-8"
+          result.body shouldBe "2T2XXEEEOEEO"
+          result.gameState shouldBe game.Turn(Player2, board)
+        })
+        .unsafeToFuture
+    }
+
+    "when it is Player2's turn and player 1 moves, keeps current state" in {
+      val board = Board.fromStatusString("---XEXEOEEEE")
+      new Test(game.Turn(Player2, board), Player1, Method.POST, Uri.uri("/play/7"), Some("1"))
+        .run()
+        .map(result => {
+          result.statusCode shouldBe Status.Ok
+          result.setCookie shouldBe None
+          result.contentType shouldBe "text/plain; charset=UTF-8"
+          result.body shouldBe "1T2XEXEOEEEE"
+          result.gameState shouldBe game.Turn(Player2, board)
+        })
+        .unsafeToFuture
+    }
   }
 
   "POST /reset" - {
