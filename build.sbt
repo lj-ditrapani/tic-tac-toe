@@ -86,8 +86,12 @@ copyJs := {
   )
 }
 
+commands += Command.command("checkSharedCoverage") { state =>
+  "coverageOn" :: "sharedJVM/clean" :: "sharedJVM/test" :: "coverageReport" :: state
+}
+
 commands += Command.command("checkCoverage") { state =>
-  "coverage" :: "sharedJVM/clean" :: "sharedJVM/test" :: "coverageReport" :: state
+  "coverageOn" :: "clean" :: "sharedJVM/test" :: "server/test" :: "coverageReport" :: state
 }
 
 commands += Command.command("build") { state =>

@@ -75,11 +75,4 @@ Finite State Machine:
 TODO
 ----
 
-- Write all server endpoint tests
 - Rewrite client using immutable store architecture
-- Maybe bad requests/forbidden should return 400 (bad request) 403 (forbidden)
-    - POST play with index out of bounds
-    - POST play with index not empty cell
-    - Player1 trying to POST play on Player2's turn
-    - Player trying to POST play in wrong game state
-    - POST reset when not game over
