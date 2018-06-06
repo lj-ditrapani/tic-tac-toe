@@ -19,7 +19,7 @@ final case class Result(
     gameState: Game
 )
 
-object MakeArgs {
+object makeArgs {
   def apply(gameState: game.Game, player: Player): IO[Args] =
     for {
       stateRef <- Ref[IO, State](State(gameState, player))
@@ -46,11 +46,6 @@ class Test(gameState: Game, player: Player, method: Method, path: Uri, id: Optio
       contentType = headers.get(CaseInsensitiveString("Content-Type")).map(_.value).get
     } yield Result(response.status, setCookie, contentType, body.mkString(""), newGameState)
   }
-
-  def makeArgs(gameState: game.Game, player: Player): IO[Args] =
-    for {
-      stateRef <- Ref[IO, State](State(gameState, player))
-    } yield Args(1, 2, stateRef)
 }
 
 @SuppressWarnings(Array("org.wartremover.warts.Throw"))
@@ -129,7 +124,7 @@ class ServerTest extends AsyncSpec with KleisliSyntax with OptionValues {
       "when missing, rejurns 404 not found" in {
         val request = Request[IO](Method.GET, Uri.uri("/js/pacman.js"))
         (for {
-          args <- MakeArgs(game.ReadyPlayer1, Player1)
+          args <- makeArgs(game.ReadyPlayer1, Player1)
           server = new Server(args)
           response <- server.service.orNotFound.run(request)
         } yield {
