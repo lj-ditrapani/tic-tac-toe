@@ -77,10 +77,12 @@ copyJs := {
   import java.nio.file.Files
   val jsFileNames = List("client-jsdeps.min.js", "client-opt.js", "client-opt.js.map")
   val dir = baseDirectory.value
+  val serverJsDir = "server/src/main/resources/js"
+  new File(serverJsDir).mkdir()
   jsFileNames.foreach(name =>
       Files.copy(
         new File(dir, s"client/target/scala-2.12/$name").toPath,
-        new File(dir, s"server/src/main/resources/js/$name").toPath,
+        new File(dir, s"$serverJsDir/$name").toPath,
         java.nio.file.StandardCopyOption.REPLACE_EXISTING
       )
   )

@@ -75,4 +75,5 @@ Finite State Machine:
 TODO
 ----
 
+- test if port is missing (use 80), does it give unfedine on client port?
 - Rewrite client using immutable store architecture
