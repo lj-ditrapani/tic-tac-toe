@@ -16,9 +16,16 @@ import game.Game
 import model.{Actor, Entity, Spectator}
 
 object App {
-  val host: String = document.location.host.split(":")(0)
-  val port: Int = document.location.host.split(":")(1).toInt
-  val baseRequest: HttpRequest = HttpRequest().withHost(host).withPort(port)
+  val baseRequest: HttpRequest = {
+    val hostPort: Array[String] = document.location.host.split(":")
+    val host: String = hostPort(0)
+    val request = HttpRequest().withHost(host)
+    if (hostPort.length > 1) {
+      request.withPort(hostPort(1).toInt)
+    } else {
+      request
+    }
+  }
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   var entity: Entity = Spectator
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
