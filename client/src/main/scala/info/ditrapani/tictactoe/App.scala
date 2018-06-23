@@ -4,7 +4,7 @@ import org.scalajs.dom.document
 import org.scalajs.jquery.jQuery
 import fr.hmil.roshttp
 import monix.execution.Scheduler.Implicits.global
-import roshttp.HttpRequest
+import roshttp.{HttpRequest, Protocol}
 import roshttp.Method.POST
 import roshttp.response.SimpleHttpResponse
 import scala.scalajs.js.timers
@@ -19,11 +19,17 @@ object App {
   val baseRequest: HttpRequest = {
     val hostPort: Array[String] = document.location.host.split(":")
     val host: String = hostPort(0)
-    val request = HttpRequest().withHost(host)
-    if (hostPort.length > 1) {
-      request.withPort(hostPort(1).toInt)
+    val request1 = HttpRequest().withHost(host)
+    val request2 =
+      if (hostPort.length > 1) {
+        request1.withPort(hostPort(1).toInt)
+      } else {
+        request1
+      }
+    if (document.location.protocol == "https:") {
+      request2.withProtocol(Protocol.HTTPS)
     } else {
-      request
+      request2
     }
   }
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
