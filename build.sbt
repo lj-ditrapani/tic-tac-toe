@@ -55,7 +55,6 @@ lazy val client = project
     libraryDependencies ++= Seq(
       "be.doeraene" %%% "scalajs-jquery" % "0.9.3",
       "com.lihaoyi" %%% "scalatags" % "0.6.7",
-      "fr.hmil" %%% "roshttp" % "2.1.0",
       "org.scala-js" %%% "scalajs-dom" % "0.9.6"
     ),
     skip in packageJSDependencies := false,

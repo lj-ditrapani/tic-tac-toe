@@ -1,12 +1,9 @@
 package info.ditrapani.tictactoe
 
-import org.scalajs.dom.document
+import org.scalajs.dom.ext.Ajax
+import org.scalajs.dom.XMLHttpRequest
 import org.scalajs.jquery.jQuery
-import fr.hmil.roshttp
 import monix.execution.Scheduler.Implicits.global
-import roshttp.{HttpRequest, Protocol}
-import roshttp.Method.POST
-import roshttp.response.SimpleHttpResponse
 import scala.scalajs.js.timers
 import model.Board
 import model.cell
@@ -16,22 +13,6 @@ import game.Game
 import model.{Actor, Entity, Spectator}
 
 object App {
-  val baseRequest: HttpRequest = {
-    val hostPort: Array[String] = document.location.host.split(":")
-    val host: String = hostPort(0)
-    val request1 = HttpRequest().withHost(host)
-    val request2 =
-      if (hostPort.length > 1) {
-        request1.withPort(hostPort(1).toInt)
-      } else {
-        request1
-      }
-    if (document.location.protocol == "https:") {
-      request2.withProtocol(Protocol.HTTPS)
-    } else {
-      request2
-    }
-  }
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   var entity: Entity = Spectator
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
@@ -51,29 +32,17 @@ object App {
   }
 
   def postPlay(index: Int): Unit = {
-    baseRequest
-      .withPath(s"/play/$index")
-      .withMethod(POST)
-      .send()
-      .map(updateStatusWith)
+    Ajax.post(s"/play/$index").map(updateStatusWith)
     (): Unit
   }
 
   def postReset(): Unit = {
-    baseRequest
-      .withPath("/reset")
-      .withMethod(POST)
-      .send()
-      .map(updateStatusWith)
+    Ajax.post("/reset").map(updateStatusWith)
     (): Unit
   }
 
   def postAcceptReset(): Unit = {
-    baseRequest
-      .withPath("/accept-reset")
-      .withMethod(POST)
-      .send()
-      .map(updateStatusWith)
+    Ajax.post("/accept-reset").map(updateStatusWith)
     (): Unit
   }
 
@@ -118,9 +87,8 @@ object App {
 
   @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
   def statusUpdateLoop(): Unit = {
-    baseRequest
-      .withPath("/status")
-      .send()
+    Ajax
+      .get("/status")
       .map(updateStatusWith)
       .map(
         _ =>
@@ -131,8 +99,8 @@ object App {
     (): Unit
   }
 
-  def updateStatusWith(response: SimpleHttpResponse): Unit = {
-    val status = response.body
+  def updateStatusWith(response: XMLHttpRequest): Unit = {
+    val status = response.responseText
     entity = Entity.fromStatusString(status)
     gameState = Game.fromStatusString(status)
     jQuery("#entity").text(s"You are $entity")

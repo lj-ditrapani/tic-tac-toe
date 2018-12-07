@@ -72,8 +72,40 @@ Finite State Machine:
 ![doc/finite-state-machine.png](doc/finite-state-machine.png)
 
 
+Develop
+-------
+
+Test coverage:
+
+```
+    sbt checkTestCovergae
+```
+
+Shared code:  prefix normal sbt commands with sharedJVM.
+
+```
+    sbt sharedJVM/clean
+    sbt sharedJVM/compile
+    sbt sharedJVM/test
+```
+
+Server:  prefix normal sbt commands with server.
+
+```
+    sbt server/clean
+    sbt server/compile
+    sbt server/test
+```
+
+Client:
+
+```
+    sbt client/clean
+    sbt client/compile
+```
+
+
 TODO
 ----
 
-- test if port is missing (use 80), does it give unfedine on client port?
 - Rewrite client using immutable store architecture
