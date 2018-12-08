@@ -3,7 +3,7 @@ import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 lazy val commonSettings = Seq(
   organization := "info.ditrapani",
   version := "1.0.3",
-  scalaVersion := "2.12.6",
+  scalaVersion := "2.12.8",
   scalacOptions ++= Seq(
     "-deprecation",
     "-encoding",
@@ -19,7 +19,7 @@ lazy val commonSettings = Seq(
   ),
   libraryDependencies ++= Seq(
     // test
-    "org.mockito" % "mockito-core" % "2.18.3" % "test",
+    "org.mockito" % "mockito-core" % "2.23.4" % "test",
     "org.scalatest" %% "scalatest" % "3.0.5" % "test"
   ),
   wartremoverWarnings ++= Warts.allBut(
@@ -33,7 +33,7 @@ lazy val shared = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure
 lazy val sharedJvm = shared.jvm
 lazy val sharedJs = shared.js
 
-val Http4sVersion = "0.18.12"
+val Http4sVersion = "0.18.21"
 
 lazy val server = project
   .in(file("server"))
@@ -53,7 +53,7 @@ lazy val client = project
     commonSettings,
     scalaJSUseMainModuleInitializer := true,
     libraryDependencies ++= Seq(
-      "be.doeraene" %%% "scalajs-jquery" % "0.9.3",
+      "be.doeraene" %%% "scalajs-jquery" % "0.9.4",
       "com.lihaoyi" %%% "scalatags" % "0.6.7",
       "org.scala-js" %%% "scalajs-dom" % "0.9.6"
     ),

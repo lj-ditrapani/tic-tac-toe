@@ -20,6 +20,8 @@ Open `localhost:8080/` in browser.
 Then have your friend (assuming you have friends) open `<your ip>:8080/` in their browser.
 If you have no friends, open a private/incognito browser window to play against yourself.
 
+If you've run scoverage, make sure you `sbt coverageOff` and `sbt clean` before you build.
+
 
 Notes
 -----
