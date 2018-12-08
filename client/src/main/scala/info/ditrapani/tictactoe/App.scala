@@ -3,7 +3,6 @@ package info.ditrapani.tictactoe
 import org.scalajs.dom.ext.Ajax
 import org.scalajs.dom.XMLHttpRequest
 import org.scalajs.jquery.jQuery
-import monix.execution.Scheduler.Implicits.global
 import scala.scalajs.js.timers
 import model.Board
 import model.cell
@@ -11,8 +10,11 @@ import cell.Cell
 import model.game
 import game.Game
 import model.{Actor, Entity, Spectator}
+import scala.concurrent.ExecutionContext
 
 object App {
+  val ec: ExecutionContext = ExecutionContext.global
+
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   var entity: Entity = Spectator
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
@@ -32,17 +34,17 @@ object App {
   }
 
   def postPlay(index: Int): Unit = {
-    Ajax.post(s"/play/$index").map(updateStatusWith)
+    Ajax.post(s"/play/$index").map(updateStatusWith)(ec)
     (): Unit
   }
 
   def postReset(): Unit = {
-    Ajax.post("/reset").map(updateStatusWith)
+    Ajax.post("/reset").map(updateStatusWith)(ec)
     (): Unit
   }
 
   def postAcceptReset(): Unit = {
-    Ajax.post("/accept-reset").map(updateStatusWith)
+    Ajax.post("/accept-reset").map(updateStatusWith)(ec)
     (): Unit
   }
 
@@ -89,13 +91,13 @@ object App {
   def statusUpdateLoop(): Unit = {
     Ajax
       .get("/status")
-      .map(updateStatusWith)
+      .map(updateStatusWith)(ec)
       .map(
         _ =>
           timers.setTimeout(500) {
             statusUpdateLoop()
         }
-      )
+      )(ec)
     (): Unit
   }
 
