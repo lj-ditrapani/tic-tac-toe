@@ -40,7 +40,7 @@ object Styles extends StyleSheet {
   )
 
   val body = cls(
-    s.fontFamily := "'Press Start 2P'",
+    s.fontFamily := "monospace",
     s.fontSize := "16px"
   )
 
@@ -54,7 +54,7 @@ object Styles extends StyleSheet {
   )
 
   val button = cls(
-    s.fontFamily := "'Press Start 2P'",
+    s.fontFamily := "monospace",
     s.fontSize := "16px",
     s.border := "none",
     s.textAlign := "center",
